@@ -4,10 +4,7 @@ namespace Diese.Injection
 {
     public interface IDependencyInjector
     {
-        T Resolve<T>();
-        object Resolve(Type type);
-
-        T ResolveKeyed<T>(object key);
-        object ResolveKeyed(Type type, object key);
+        T Resolve<T>(object key = null);
+        object Resolve(Type type, object key = null);
     }
 }

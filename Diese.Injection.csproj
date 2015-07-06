@@ -39,10 +39,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DependencyContainer.cs" />
+    <Compile Include="Exceptions\AlreadyRegisterException.cs" />
+    <Compile Include="DependencyRegistry.cs" />
     <Compile Include="DependencyInjector.cs" />
-    <Compile Include="IDependencyContainer.cs" />
+    <Compile Include="Exceptions\CyclicDependencyException.cs" />
+    <Compile Include="Factories\Data\ParameterData.cs" />
+    <Compile Include="Factories\Data\ConstructorData.cs" />
+    <Compile Include="Factories\InstanceFactory.cs" />
+    <Compile Include="Factories\SingletonFactory.cs" />
+    <Compile Include="Factories\TransientFactory.cs" />
+    <Compile Include="IDependencyRegistry.cs" />
     <Compile Include="IDependencyInjector.cs" />
+    <Compile Include="Factories\IDependencyFactory.cs" />
+    <Compile Include="Exceptions\NotRegisterException.cs" />
+    <Compile Include="ServiceKeyAttribute.cs" />
     <Compile Include="Subsistence.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -1,12 +1,26 @@
-﻿namespace Diese.Injection
-{
-    //public class DependencyInjector : IDependencyInjector
-    //{
-    //    private IDependencyContainer _container;
+﻿using System;
 
-    //    public DependencyInjector(IDependencyContainer container)
-    //    {
-    //        _container = container;
-    //    }
-    //}
+namespace Diese.Injection
+{
+    public class DependencyInjector : IDependencyInjector
+    {
+        private readonly IDependencyRegistry _registry;
+
+        public DependencyInjector(IDependencyRegistry registry)
+        {
+            _registry = registry;
+
+            _registry.Injector = this;
+        }
+
+        public T Resolve<T>(object key = null)
+        {
+            return (T)Resolve(typeof(T), key);
+        }
+
+        public object Resolve(Type type, object key = null)
+        {
+            return _registry[type, key];
+        }
+    }
 }
