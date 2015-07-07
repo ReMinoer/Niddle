@@ -8,14 +8,11 @@ namespace Diese.Injection.Factories
 {
     internal class TransientFactory : IDependencyFactory
     {
-        static private readonly Stack<IDependencyFactory> FactoryStack = new Stack<IDependencyFactory>();
-
         private readonly ConstructorData _constructorData;
-
+        private bool _alreadyInvoke;
+        static private readonly Stack<IDependencyFactory> FactoryStack = new Stack<IDependencyFactory>();
         public Type Type { get; private set; }
         public object ServiceKey { get; private set; }
-
-        private bool _alreadyInvoke;
 
         public TransientFactory(Type type, object serviceKey, ConstructorInfo constructorInfo)
         {

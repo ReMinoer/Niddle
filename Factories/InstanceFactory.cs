@@ -5,7 +5,6 @@ namespace Diese.Injection.Factories
     internal class InstanceFactory : IDependencyFactory
     {
         private readonly object _instance;
-
         public Type Type { get; private set; }
         public object ServiceKey { get; private set; }
 

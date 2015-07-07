@@ -34,7 +34,7 @@ namespace Diese.Injection
 
                 if (!_defaultFactories.TryGetValue(type, out factory))
                     throw new NotRegisterException(type);
-                
+
                 return factory;
             }
         }
@@ -49,46 +49,50 @@ namespace Diese.Injection
             AddFactory(new InstanceFactory(abstractType, instance, serviceKey));
         }
 
-        public void Register<T>(Subsistence subsistence = Subsistence.Transient, object serviceKey = null, ConstructorInfo constructor = null)
+        public void Register<T>(Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
+            ConstructorInfo constructor = null)
         {
             Register(typeof(T), subsistence, serviceKey, constructor);
         }
 
-        public void Register(Type type, Subsistence subsistence = Subsistence.Transient, object serviceKey = null, ConstructorInfo constructor = null)
+        public void Register(Type type, Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
+            ConstructorInfo constructor = null)
         {
             Register(type, type, subsistence, serviceKey, constructor);
         }
 
-        public void Register<TAbstract, TImplmentation>(Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
-            ConstructorInfo constructor = null) where TImplmentation : TAbstract
+        public void Register<TAbstract, TImplmentation>(Subsistence subsistence = Subsistence.Transient,
+            object serviceKey = null, ConstructorInfo constructor = null) where TImplmentation : TAbstract
         {
             Register(typeof(TAbstract), typeof(TImplmentation), subsistence, serviceKey, constructor);
         }
 
-        public void Register<TAbstract>(Type implementationType, Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
-            ConstructorInfo constructor = null)
+        public void Register<TAbstract>(Type implementationType, Subsistence subsistence = Subsistence.Transient,
+            object serviceKey = null, ConstructorInfo constructor = null)
         {
             Register(typeof(TAbstract), implementationType, subsistence, serviceKey, constructor);
         }
 
-        public void Register(Type abstractType, Type implementationType, Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
-            ConstructorInfo constructor = null)
+        public void Register(Type abstractType, Type implementationType, Subsistence subsistence = Subsistence.Transient,
+            object serviceKey = null, ConstructorInfo constructor = null)
         {
             if (subsistence == Subsistence.Singleton)
-                AddFactory(new SingletonFactory(abstractType, serviceKey, constructor ?? GetDefaultConstructor(implementationType)));
+                AddFactory(new SingletonFactory(abstractType, serviceKey,
+                    constructor ?? GetDefaultConstructor(implementationType)));
             else
-                AddFactory(new TransientFactory(abstractType, serviceKey, constructor ?? GetDefaultConstructor(implementationType)));
+                AddFactory(new TransientFactory(abstractType, serviceKey,
+                    constructor ?? GetDefaultConstructor(implementationType)));
         }
 
         private void AddFactory(IDependencyFactory factory)
         {
             if (factory.ServiceKey != null)
-                AddKeyedFactory(factory);
+                AddToKeyedFactory(factory);
             else
-                AddDefaultFactory(factory);
+                AddToDefaultFactory(factory);
         }
 
-        private void AddDefaultFactory(IDependencyFactory factory)
+        private void AddToDefaultFactory(IDependencyFactory factory)
         {
             Type type = factory.Type;
 
@@ -101,7 +105,7 @@ namespace Diese.Injection
             _defaultFactories.Add(type, factory);
         }
 
-        private void AddKeyedFactory(IDependencyFactory factory)
+        private void AddToKeyedFactory(IDependencyFactory factory)
         {
             var keyedService = new KeyedService(factory.Type, factory.ServiceKey);
 
@@ -111,26 +115,16 @@ namespace Diese.Injection
             _keyedFactories.Add(keyedService, factory);
         }
 
-        private static ConstructorInfo GetDefaultConstructor(Type type)
+        static private ConstructorInfo GetDefaultConstructor(Type type)
         {
             return type.GetConstructors()
-                   .Aggregate((min, next) => next.GetParameters().Length < min.GetParameters().Length ? next : min);
+                .Aggregate((min, next) => next.GetParameters().Length < min.GetParameters().Length ? next : min);
         }
 
         private struct KeyedService
         {
             private readonly Type _type;
             private readonly object _serviceKey;
-
-            public Type Type
-            {
-                get { return _type; }
-            }
-
-            public object ServiceKey
-            {
-                get { return _serviceKey; }
-            }
 
             public KeyedService(Type type, object serviceKey)
             {

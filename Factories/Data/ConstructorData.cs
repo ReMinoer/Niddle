@@ -13,7 +13,7 @@ namespace Diese.Injection.Factories.Data
         {
             get { return ParametersData.Length; }
         }
- 
+
         public ConstructorData(ConstructorInfo constructorInfo)
         {
             ConstructorInfo = constructorInfo;
@@ -24,7 +24,7 @@ namespace Diese.Injection.Factories.Data
             for (int i = 0; i < ParametersData.Length; i++)
             {
                 ParameterInfo parameterInfo = parameterInfos[i];
-                var parameter = new ParameterData { Type = parameterInfo.ParameterType };
+                var parameter = new ParameterData {Type = parameterInfo.ParameterType};
 
                 Attribute[] attributes = parameterInfo.GetCustomAttributes(typeof(ServiceKeyAttribute)).ToArray();
                 if (attributes.Length > 0)
