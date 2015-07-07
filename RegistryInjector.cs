@@ -2,11 +2,11 @@
 
 namespace Diese.Injection
 {
-    public class DependencyInjector : IDependencyInjector
+    public class RegistryInjector : IDependencyInjector
     {
         private readonly IDependencyRegistry _registry;
 
-        public DependencyInjector(IDependencyRegistry registry)
+        public RegistryInjector(IDependencyRegistry registry)
         {
             _registry = registry;
         }
