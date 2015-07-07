@@ -10,15 +10,15 @@ namespace Diese.Injection
     public class DependencyRegistry : IDependencyRegistry
     {
         private readonly Dictionary<Type, IDependencyFactory> _defaultFactories;
-        private readonly Dictionary<object, IDependencyFactory> _keyedFactories;
+        private readonly Dictionary<KeyedService, IDependencyFactory> _keyedFactories;
 
         public DependencyRegistry()
         {
             _defaultFactories = new Dictionary<Type, IDependencyFactory>();
-            _keyedFactories = new Dictionary<object, IDependencyFactory>();
+            _keyedFactories = new Dictionary<KeyedService, IDependencyFactory>();
         }
 
-        public IDependencyFactory this[Type type, object serviceKey]
+        public IDependencyFactory this[Type type, object serviceKey = null]
         {
             get
             {
@@ -26,7 +26,7 @@ namespace Diese.Injection
 
                 if (serviceKey != null)
                 {
-                    if (!_keyedFactories.TryGetValue(serviceKey, out factory))
+                    if (!_keyedFactories.TryGetValue(new KeyedService(type, serviceKey), out factory))
                         throw new NotRegisterException(serviceKey);
 
                     return factory;
@@ -90,27 +90,58 @@ namespace Diese.Injection
 
         private void AddDefaultFactory(IDependencyFactory factory)
         {
-            if (factory.Type == null)
+            Type type = factory.Type;
+
+            if (type == null)
                 throw new NullReferenceException("Registered type is null !");
 
-            if (_defaultFactories.ContainsKey(factory.Type))
-                throw new AlreadyRegisterException(factory.Type);
+            if (_defaultFactories.ContainsKey(type))
+                throw new AlreadyRegisterException(type);
 
-            _defaultFactories.Add(factory.Type, factory);
+            _defaultFactories.Add(type, factory);
         }
 
         private void AddKeyedFactory(IDependencyFactory factory)
         {
-            if (_keyedFactories.ContainsKey(factory.ServiceKey))
-                throw new AlreadyRegisterException(factory.ServiceKey);
+            var keyedService = new KeyedService(factory.Type, factory.ServiceKey);
 
-            _keyedFactories.Add(factory.ServiceKey, factory);
+            if (_keyedFactories.ContainsKey(keyedService))
+                throw new AlreadyRegisterException(factory.Type, factory.ServiceKey);
+
+            _keyedFactories.Add(keyedService, factory);
         }
 
         private static ConstructorInfo GetDefaultConstructor(Type type)
         {
             return type.GetConstructors()
                    .Aggregate((min, next) => next.GetParameters().Length < min.GetParameters().Length ? next : min);
+        }
+
+        private struct KeyedService
+        {
+            private readonly Type _type;
+            private readonly object _serviceKey;
+
+            public Type Type
+            {
+                get { return _type; }
+            }
+
+            public object ServiceKey
+            {
+                get { return _serviceKey; }
+            }
+
+            public KeyedService(Type type, object serviceKey)
+            {
+                _type = type;
+                _serviceKey = serviceKey;
+            }
+
+            public override int GetHashCode()
+            {
+                return _type.GetHashCode() + _serviceKey.GetHashCode();
+            }
         }
     }
 }

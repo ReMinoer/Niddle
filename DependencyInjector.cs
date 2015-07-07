@@ -11,14 +11,14 @@ namespace Diese.Injection
             _registry = registry;
         }
 
-        public T Resolve<T>(object key = null)
+        public T Resolve<T>(object serviceKey = null)
         {
-            return (T)Resolve(typeof(T), key);
+            return (T)Resolve(typeof(T), serviceKey);
         }
 
-        public object Resolve(Type type, object key = null)
+        public object Resolve(Type type, object serviceKey = null)
         {
-            return _registry[type, key].Get(this);
+            return _registry[type, serviceKey].Get(this);
         }
     }
 }
