@@ -5,9 +5,7 @@ namespace Diese.Injection
 {
     public interface IDependencyRegistry
     {
-        DependencyInjector Injector { set; }
-
-        object this[Type type, object serviceKey = null] { get; }
+        IDependencyFactory this[Type type, object serviceKey = null] { get; }
 
         void RegisterInstance<TAbstract>(object instance, object serviceKey = null);
         void RegisterInstance(Type abstractType, object instance, object serviceKey = null);

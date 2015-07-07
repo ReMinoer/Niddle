@@ -50,7 +50,7 @@
     <Compile Include="Factories\TransientFactory.cs" />
     <Compile Include="IDependencyRegistry.cs" />
     <Compile Include="IDependencyInjector.cs" />
-    <Compile Include="Factories\IDependencyFactory.cs" />
+    <Compile Include="IDependencyFactory.cs" />
     <Compile Include="Exceptions\NotRegisterException.cs" />
     <Compile Include="ServiceKeyAttribute.cs" />
     <Compile Include="Subsistence.cs" />

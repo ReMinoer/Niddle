@@ -9,8 +9,6 @@ namespace Diese.Injection
         public DependencyInjector(IDependencyRegistry registry)
         {
             _registry = registry;
-
-            _registry.Injector = this;
         }
 
         public T Resolve<T>(object key = null)
@@ -20,7 +18,7 @@ namespace Diese.Injection
 
         public object Resolve(Type type, object key = null)
         {
-            return _registry[type, key];
+            return _registry[type, key].Get(this);
         }
     }
 }

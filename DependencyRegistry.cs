@@ -9,14 +9,8 @@ namespace Diese.Injection
 {
     public class DependencyRegistry : IDependencyRegistry
     {
-        private DependencyInjector _injector;
         private readonly Dictionary<Type, IDependencyFactory> _defaultFactories;
         private readonly Dictionary<object, IDependencyFactory> _keyedFactories;
-
-        public DependencyInjector Injector
-        {
-            set { _injector = value; }
-        }
 
         public DependencyRegistry()
         {
@@ -24,7 +18,7 @@ namespace Diese.Injection
             _keyedFactories = new Dictionary<object, IDependencyFactory>();
         }
 
-        public object this[Type type, object serviceKey]
+        public IDependencyFactory this[Type type, object serviceKey]
         {
             get
             {
@@ -35,13 +29,13 @@ namespace Diese.Injection
                     if (!_keyedFactories.TryGetValue(serviceKey, out factory))
                         throw new NotRegisterException(serviceKey);
 
-                    return factory.Get(_injector);
+                    return factory;
                 }
 
                 if (!_defaultFactories.TryGetValue(type, out factory))
                     throw new NotRegisterException(type);
                 
-                return factory.Get(_injector);
+                return factory;
             }
         }
 

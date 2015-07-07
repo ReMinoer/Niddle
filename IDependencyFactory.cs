@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Diese.Injection.Factories
+namespace Diese.Injection
 {
-    internal interface IDependencyFactory
+    public interface IDependencyFactory
     {
         Type Type { get; }
         object ServiceKey { get; }
