@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Diese.Injection.Factories.Data
 {
@@ -20,18 +18,8 @@ namespace Diese.Injection.Factories.Data
 
             ParameterInfo[] parameterInfos = constructorInfo.GetParameters();
             ParametersData = new ParameterData[parameterInfos.Length];
-
             for (int i = 0; i < ParametersData.Length; i++)
-            {
-                ParameterInfo parameterInfo = parameterInfos[i];
-                var parameter = new ParameterData {Type = parameterInfo.ParameterType};
-
-                Attribute[] attributes = parameterInfo.GetCustomAttributes(typeof(ServiceKeyAttribute)).ToArray();
-                if (attributes.Length > 0)
-                    parameter.ServiceKey = ((ServiceKeyAttribute)attributes.First()).Key;
-
-                ParametersData[i] = parameter;
-            }
+                ParametersData[i] = new ParameterData(parameterInfos[i]);
         }
     }
 }

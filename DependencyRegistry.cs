@@ -134,7 +134,7 @@ namespace Diese.Injection
 
             public override int GetHashCode()
             {
-                return _type.GetHashCode() + _serviceKey.GetHashCode();
+                return _type.GetHashCode() ^ _serviceKey.GetHashCode();
             }
         }
     }

@@ -41,6 +41,10 @@
   <ItemGroup>
     <Compile Include="Exceptions\AlreadyRegisterException.cs" />
     <Compile Include="DependencyRegistry.cs" />
+    <Compile Include="Factories\Data\FieldData.cs" />
+    <Compile Include="Factories\Data\MemberData.cs" />
+    <Compile Include="Factories\Data\PropertyData.cs" />
+    <Compile Include="InjectableAttribute.cs" />
     <Compile Include="RegistryInjector.cs" />
     <Compile Include="Exceptions\CyclicDependencyException.cs" />
     <Compile Include="Factories\Data\ParameterData.cs" />

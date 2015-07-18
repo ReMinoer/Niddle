@@ -1,19 +1,19 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
 
 namespace Diese.Injection.Factories.Data
 {
-    internal class ParameterData
+    internal class MemberData
     {
         public Type Type { get; private set; }
         public object ServiceKey { get; private set; }
 
-        public ParameterData(ParameterInfo parameterInfo)
+        public MemberData(Type type, MemberInfo memberInfo)
         {
-            Type = parameterInfo.ParameterType;
+            Type = type;
 
-            Attribute[] attributes = parameterInfo.GetCustomAttributes(typeof(ServiceKeyAttribute)).ToArray();
+            Attribute[] attributes = memberInfo.GetCustomAttributes(typeof(ServiceKeyAttribute)).ToArray();
             if (attributes.Length > 0)
                 ServiceKey = ((ServiceKeyAttribute)attributes.First()).Key;
         }
