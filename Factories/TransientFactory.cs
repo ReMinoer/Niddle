@@ -9,11 +9,11 @@ namespace Diese.Injection.Factories
 {
     internal class TransientFactory : IDependencyFactory
     {
+        static private readonly Stack<IDependencyFactory> FactoryStack = new Stack<IDependencyFactory>();
         private readonly ConstructorData _constructorData;
         private readonly PropertyData[] _propertiesData;
         private readonly FieldData[] _fieldsData;
         private bool _alreadyInvoke;
-        static private readonly Stack<IDependencyFactory> FactoryStack = new Stack<IDependencyFactory>();
         public Type Type { get; private set; }
         public object ServiceKey { get; private set; }
 
@@ -63,7 +63,6 @@ namespace Diese.Injection.Factories
             object instance = _constructorData.ConstructorInfo.Invoke(parameters);
 
             foreach (FieldData field in _fieldsData)
-            {
                 try
                 {
                     field.FieldInfo.SetValue(instance, injector.Resolve(field.Type, field.ServiceKey));
@@ -71,10 +70,8 @@ namespace Diese.Injection.Factories
                 catch (NotRegisterException)
                 {
                 }
-            }
 
             foreach (PropertyData property in _propertiesData)
-            {
                 try
                 {
                     property.PropertyInfo.SetValue(instance, injector.Resolve(property.Type, property.ServiceKey));
@@ -82,7 +79,6 @@ namespace Diese.Injection.Factories
                 catch (NotRegisterException)
                 {
                 }
-            }
 
             _alreadyInvoke = false;
             FactoryStack.Pop();
