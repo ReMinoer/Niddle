@@ -7,8 +7,8 @@ namespace Diese.Injection.Factories
     {
         private object _instance;
 
-        public SingletonFactory(Type type, object serviceKey, ConstructorInfo constructorInfo)
-            : base(type, serviceKey, constructorInfo)
+        public SingletonFactory(Type type, object serviceKey, ConstructorInfo constructorInfo, Substitution substitution)
+            : base(type, serviceKey, constructorInfo, substitution)
         {
         }
 

@@ -27,7 +27,7 @@ namespace Diese.Injection
                 if (serviceKey != null)
                 {
                     if (!_keyedFactories.TryGetValue(new KeyedService(type, serviceKey), out factory))
-                        throw new NotRegisterException(serviceKey);
+                        throw new NotRegisterException(type, serviceKey);
 
                     return factory;
                 }
@@ -39,49 +39,70 @@ namespace Diese.Injection
             }
         }
 
-        public void RegisterInstance<TAbstract>(object instance, object serviceKey = null)
+        public void RegisterInstance<TAbstract>(object instance, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
         {
-            RegisterInstance(typeof(TAbstract), instance, serviceKey);
+            RegisterInstance(typeof(TAbstract), instance, serviceKey, substitution);
         }
 
-        public void RegisterInstance(Type abstractType, object instance, object serviceKey = null)
+        public void RegisterInstance(Type abstractType, object instance, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
         {
-            AddFactory(new InstanceFactory(abstractType, instance, serviceKey));
+            AddFactory(new InstanceFactory(abstractType, instance, serviceKey, substitution));
+        }
+
+        public void RegisterLazy<T>(Func<T> factory, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
+        {
+            AddFactory(new LazyFactory<T>(factory, serviceKey, substitution));
+        }
+
+        public void RegisterAction<TIn>(Action<TIn> action, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
+        {
+            AddFactory(new ActionFactory<TIn>(action, serviceKey, substitution));
+        }
+
+        public void RegisterFunc<TOut>(Func<TOut> func, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
+        {
+            AddFactory(new FuncFactory<TOut>(func, serviceKey, substitution));
+        }
+
+        public void RegisterFunc<TIn, TOut>(Func<TIn, TOut> func, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
+        {
+            AddFactory(new FuncFactory<TIn, TOut>(func, serviceKey, substitution));
         }
 
         public void Register<T>(Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
-            ConstructorInfo constructor = null)
+            ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
         {
-            Register(typeof(T), subsistence, serviceKey, constructor);
+            Register(typeof(T), subsistence, serviceKey, constructor, substitution);
         }
 
         public void Register(Type type, Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
-            ConstructorInfo constructor = null)
+            ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
         {
-            Register(type, type, subsistence, serviceKey, constructor);
+            Register(type, type, subsistence, serviceKey, constructor, substitution);
         }
 
         public void Register<TAbstract, TImplmentation>(Subsistence subsistence = Subsistence.Transient,
-            object serviceKey = null, ConstructorInfo constructor = null) where TImplmentation : TAbstract
+            object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
+            where TImplmentation : TAbstract
         {
-            Register(typeof(TAbstract), typeof(TImplmentation), subsistence, serviceKey, constructor);
+            Register(typeof(TAbstract), typeof(TImplmentation), subsistence, serviceKey, constructor, substitution);
         }
 
         public void Register<TAbstract>(Type implementationType, Subsistence subsistence = Subsistence.Transient,
-            object serviceKey = null, ConstructorInfo constructor = null)
+            object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
         {
-            Register(typeof(TAbstract), implementationType, subsistence, serviceKey, constructor);
+            Register(typeof(TAbstract), implementationType, subsistence, serviceKey, constructor, substitution);
         }
 
         public void Register(Type abstractType, Type implementationType, Subsistence subsistence = Subsistence.Transient,
-            object serviceKey = null, ConstructorInfo constructor = null)
+            object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
         {
             if (subsistence == Subsistence.Singleton)
                 AddFactory(new SingletonFactory(abstractType, serviceKey,
-                    constructor ?? GetDefaultConstructor(implementationType)));
+                    constructor ?? GetDefaultConstructor(implementationType), substitution));
             else
                 AddFactory(new TransientFactory(abstractType, serviceKey,
-                    constructor ?? GetDefaultConstructor(implementationType)));
+                    constructor ?? GetDefaultConstructor(implementationType), substitution));
         }
 
         private void AddFactory(IDependencyFactory factory)
@@ -100,17 +121,29 @@ namespace Diese.Injection
                 throw new NullReferenceException("Registered type is null !");
 
             if (_defaultFactories.ContainsKey(type))
-                throw new AlreadyRegisterException(type);
+            {
+                if (_defaultFactories[type].Substitution == Substitution.Forbidden)
+                    throw new AlreadyRegisterException(type);
+                
+                _defaultFactories.Remove(type);
+            }
 
             _defaultFactories.Add(type, factory);
         }
 
         private void AddToKeyedFactory(IDependencyFactory factory)
         {
-            var keyedService = new KeyedService(factory.Type, factory.ServiceKey);
+            Type type = factory.Type;
+            object serviceKey = factory.ServiceKey;
+            var keyedService = new KeyedService(type, serviceKey);
 
             if (_keyedFactories.ContainsKey(keyedService))
-                throw new AlreadyRegisterException(factory.Type, factory.ServiceKey);
+            {
+                if (_keyedFactories[keyedService].Substitution == Substitution.Forbidden)
+                    throw new AlreadyRegisterException(serviceKey);
+
+                _keyedFactories.Remove(keyedService);
+            }
 
             _keyedFactories.Add(keyedService, factory);
         }

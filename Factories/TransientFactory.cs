@@ -7,21 +7,17 @@ using Diese.Injection.Factories.Data;
 
 namespace Diese.Injection.Factories
 {
-    internal class TransientFactory : IDependencyFactory
+    internal class TransientFactory : FactoryBase
     {
         static private readonly Stack<IDependencyFactory> FactoryStack = new Stack<IDependencyFactory>();
         private readonly ConstructorData _constructorData;
         private readonly PropertyData[] _propertiesData;
         private readonly FieldData[] _fieldsData;
         private bool _alreadyInvoke;
-        public Type Type { get; private set; }
-        public object ServiceKey { get; private set; }
 
-        public TransientFactory(Type type, object serviceKey, ConstructorInfo constructorInfo)
+        public TransientFactory(Type type, object serviceKey, ConstructorInfo constructorInfo, Substitution substitution)
+            : base(type, serviceKey, substitution)
         {
-            Type = type;
-            ServiceKey = serviceKey;
-
             _constructorData = new ConstructorData(constructorInfo);
 
             PropertyInfo[] propertyInfos = type.GetProperties()
@@ -45,7 +41,7 @@ namespace Diese.Injection.Factories
                 _fieldsData[i] = new FieldData(fieldInfos[i]);
         }
 
-        public virtual object Get(IDependencyInjector injector)
+        public override object Get(IDependencyInjector injector)
         {
             if (_alreadyInvoke)
                 throw new CyclicDependencyException(FactoryStack);

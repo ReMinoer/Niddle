@@ -6,6 +6,7 @@ namespace Diese.Injection
     {
         Type Type { get; }
         object ServiceKey { get; }
+        Substitution Substitution { get; }
         object Get(IDependencyInjector injector);
     }
 }
