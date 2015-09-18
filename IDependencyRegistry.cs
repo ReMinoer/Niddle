@@ -26,11 +26,11 @@ namespace Diese.Injection
         void Register(Type abstractType, Type implementationType, Subsistence subsistence = Subsistence.Transient,
             object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden);
 
-        void Link<TRegistered, TLinked>(object registeredKey = null, object serviceKey = null,
+        void Link<TLinked, TRegistered>(object registeredKey = null, object serviceKey = null,
             Substitution substitution = Substitution.Forbidden)
-            where TLinked : TRegistered;
+            where TRegistered : TLinked;
 
-        void Link(Type registeredType, Type linkedType, object registeredKey = null, object serviceKey = null,
+        void Link(Type linkedType, Type registeredType, object registeredKey = null, object serviceKey = null,
             Substitution substitution = Substitution.Forbidden);
     }
 }

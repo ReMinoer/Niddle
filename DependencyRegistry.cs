@@ -99,14 +99,14 @@ namespace Diese.Injection
                     constructor ?? GetDefaultConstructor(implementationType), substitution));
         }
 
-        public void Link<TRegistered, TLinked>(object registeredKey = null, object serviceKey = null,
+        public void Link<TLinked, TRegistered>(object registeredKey = null, object serviceKey = null,
             Substitution substitution = Substitution.Forbidden)
-            where TLinked : TRegistered
+            where TRegistered : TLinked
         {
-            Link(typeof(TRegistered), typeof(TLinked), registeredKey, serviceKey, substitution);
+            Link(typeof(TLinked), typeof(TRegistered), registeredKey, serviceKey, substitution);
         }
 
-        public void Link(Type registeredType, Type linkedType, object registeredKey = null, object serviceKey = null,
+        public void Link(Type linkedType, Type registeredType, object registeredKey = null, object serviceKey = null,
             Substitution substitution = Substitution.Forbidden)
         {
             AddFactory(new LinkedFactory(linkedType, this[registeredType, registeredKey], serviceKey, substitution));
