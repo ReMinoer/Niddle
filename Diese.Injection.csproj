@@ -42,6 +42,7 @@
     <Compile Include="Factories\Data\MemberData.cs" />
     <Compile Include="Factories\Data\PropertyData.cs" />
     <Compile Include="Factories\ActionFactory.cs" />
+    <Compile Include="Factories\LinkedFactory.cs" />
     <Compile Include="Factories\LazyFactory.cs" />
     <Compile Include="InjectableAttribute.cs" />
     <Compile Include="RegistryInjector.cs" />

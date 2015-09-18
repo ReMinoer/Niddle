@@ -23,10 +23,14 @@ namespace Diese.Injection
             object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
             where TImplmentation : TAbstract;
 
-        void Register<TAbstract>(Type implementationType, Subsistence subsistence = Subsistence.Transient,
-            object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden);
-
         void Register(Type abstractType, Type implementationType, Subsistence subsistence = Subsistence.Transient,
             object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden);
+
+        void Link<TRegistered, TLinked>(object registeredKey = null, object serviceKey = null,
+            Substitution substitution = Substitution.Forbidden)
+            where TLinked : TRegistered;
+
+        void Link(Type registeredType, Type linkedType, object registeredKey = null, object serviceKey = null,
+            Substitution substitution = Substitution.Forbidden);
     }
 }

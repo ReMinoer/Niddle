@@ -88,12 +88,6 @@ namespace Diese.Injection
             Register(typeof(TAbstract), typeof(TImplmentation), subsistence, serviceKey, constructor, substitution);
         }
 
-        public void Register<TAbstract>(Type implementationType, Subsistence subsistence = Subsistence.Transient,
-            object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
-        {
-            Register(typeof(TAbstract), implementationType, subsistence, serviceKey, constructor, substitution);
-        }
-
         public void Register(Type abstractType, Type implementationType, Subsistence subsistence = Subsistence.Transient,
             object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
         {
@@ -103,6 +97,19 @@ namespace Diese.Injection
             else
                 AddFactory(new TransientFactory(abstractType, serviceKey,
                     constructor ?? GetDefaultConstructor(implementationType), substitution));
+        }
+
+        public void Link<TRegistered, TLinked>(object registeredKey = null, object serviceKey = null,
+            Substitution substitution = Substitution.Forbidden)
+            where TLinked : TRegistered
+        {
+            Link(typeof(TRegistered), typeof(TLinked), registeredKey, serviceKey, substitution);
+        }
+
+        public void Link(Type registeredType, Type linkedType, object registeredKey = null, object serviceKey = null,
+            Substitution substitution = Substitution.Forbidden)
+        {
+            AddFactory(new LinkedFactory(linkedType, this[registeredType, registeredKey], serviceKey, substitution));
         }
 
         private void AddFactory(IDependencyFactory factory)
