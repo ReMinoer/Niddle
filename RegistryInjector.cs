@@ -16,7 +16,7 @@ namespace Diese.Injection
             return (T)Resolve(typeof(T), serviceKey);
         }
 
-        public object Resolve(Type type, object serviceKey = null)
+        public virtual object Resolve(Type type, object serviceKey = null)
         {
             return _registry[type, serviceKey].Get(this);
         }
