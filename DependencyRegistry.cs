@@ -131,7 +131,7 @@ namespace Diese.Injection
             {
                 if (_defaultFactories[type].Substitution == Substitution.Forbidden)
                     throw new AlreadyRegisterException(type);
-                
+
                 _defaultFactories.Remove(type);
             }
 
