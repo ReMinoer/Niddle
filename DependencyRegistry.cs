@@ -81,11 +81,11 @@ namespace Diese.Injection
             Register(type, type, subsistence, serviceKey, constructor, substitution);
         }
 
-        public void Register<TAbstract, TImplmentation>(Subsistence subsistence = Subsistence.Transient,
+        public void Register<TAbstract, TImplementation>(Subsistence subsistence = Subsistence.Transient,
             object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
-            where TImplmentation : TAbstract
+            where TImplementation : TAbstract
         {
-            Register(typeof(TAbstract), typeof(TImplmentation), subsistence, serviceKey, constructor, substitution);
+            Register(typeof(TAbstract), typeof(TImplementation), subsistence, serviceKey, constructor, substitution);
         }
 
         public void Register(Type abstractType, Type implementationType, Subsistence subsistence = Subsistence.Transient,
@@ -115,12 +115,12 @@ namespace Diese.Injection
         private void AddFactory(IDependencyFactory factory)
         {
             if (factory.ServiceKey != null)
-                AddToKeyedFactory(factory);
+                AddToKeyedFactories(factory);
             else
-                AddToDefaultFactory(factory);
+                AddToDefaultFactories(factory);
         }
 
-        private void AddToDefaultFactory(IDependencyFactory factory)
+        private void AddToDefaultFactories(IDependencyFactory factory)
         {
             Type type = factory.Type;
 
@@ -138,7 +138,7 @@ namespace Diese.Injection
             _defaultFactories.Add(type, factory);
         }
 
-        private void AddToKeyedFactory(IDependencyFactory factory)
+        private void AddToKeyedFactories(IDependencyFactory factory)
         {
             Type type = factory.Type;
             object serviceKey = factory.ServiceKey;

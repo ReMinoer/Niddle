@@ -19,9 +19,9 @@ namespace Diese.Injection
         void Register(Type type, Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
             ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden);
 
-        void Register<TAbstract, TImplmentation>(Subsistence subsistence = Subsistence.Transient,
+        void Register<TAbstract, TImplementation>(Subsistence subsistence = Subsistence.Transient,
             object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
-            where TImplmentation : TAbstract;
+            where TImplementation : TAbstract;
 
         void Register(Type abstractType, Type implementationType, Subsistence subsistence = Subsistence.Transient,
             object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden);
