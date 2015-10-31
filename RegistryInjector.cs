@@ -4,11 +4,11 @@ namespace Diese.Injection
 {
     public class RegistryInjector : IDependencyInjector
     {
-        private readonly IDependencyRegistry _registry;
+        public IDependencyRegistry Registry { get; private set; }
 
         public RegistryInjector(IDependencyRegistry registry)
         {
-            _registry = registry;
+            Registry = registry;
         }
 
         public T Resolve<T>(object serviceKey = null)
@@ -18,7 +18,7 @@ namespace Diese.Injection
 
         public virtual object Resolve(Type type, object serviceKey = null)
         {
-            return _registry[type, serviceKey].Get(this);
+            return Registry[type, serviceKey].Get(this);
         }
     }
 }
