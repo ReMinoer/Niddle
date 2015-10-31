@@ -16,5 +16,10 @@ namespace Diese.Injection.Exceptions
             : base(string.Format(KeyMessage, type, key))
         {
         }
+
+        protected NotRegisterException(string message)
+            : base(message)
+        {
+        }
     }
 }
