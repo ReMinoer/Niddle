@@ -37,7 +37,7 @@
     <Compile Include="Exceptions\AlreadyRegisterException.cs" />
     <Compile Include="DependencyRegistry.cs" />
     <Compile Include="Factories\DependencyFactoryBase.cs" />
-    <Compile Include="ServiceFactoryBase.cs" />
+    <Compile Include="Factories\FactoryBase.cs" />
     <Compile Include="Factories\FuncFactory.cs" />
     <Compile Include="Factories\Data\FieldData.cs" />
     <Compile Include="Factories\Data\MemberData.cs" />
@@ -45,10 +45,10 @@
     <Compile Include="Factories\ActionFactory.cs" />
     <Compile Include="Factories\LinkedFactory.cs" />
     <Compile Include="Factories\LazyFactory.cs" />
-    <Compile Include="GenericFactory.cs" />
+    <Compile Include="Factories\GenericFactory.cs" />
     <Compile Include="IGenericFactory.cs" />
     <Compile Include="InjectableAttribute.cs" />
-    <Compile Include="IServiceFactory.cs" />
+    <Compile Include="IInjectionService.cs" />
     <Compile Include="RegistryInjector.cs" />
     <Compile Include="Exceptions\CyclicDependencyException.cs" />
     <Compile Include="Factories\Data\ParameterData.cs" />

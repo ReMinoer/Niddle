@@ -2,7 +2,7 @@
 
 namespace Diese.Injection
 {
-    public interface IServiceFactory
+    public interface IInjectionService
     {
         Type Type { get; }
         object ServiceKey { get; }

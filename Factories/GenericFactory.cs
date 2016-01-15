@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Diese.Injection.Factories;
 
-namespace Diese.Injection
+namespace Diese.Injection.Factories
 {
-    internal class GenericFactory : ServiceFactoryBase, IGenericFactory
+    internal class GenericFactory : FactoryBase, IGenericFactory
     {
         private readonly Dictionary<Type, IDependencyFactory> _dependencyFactories;
         private readonly int _constructorIndex;

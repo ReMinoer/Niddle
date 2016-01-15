@@ -2,7 +2,7 @@
 
 namespace Diese.Injection
 {
-    public interface IGenericFactory : IServiceFactory
+    public interface IGenericFactory : IInjectionService
     {
         IDependencyFactory GetFactory(Type[] genericTypeArguments);
     }

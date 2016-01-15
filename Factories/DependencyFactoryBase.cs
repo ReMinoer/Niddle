@@ -2,7 +2,7 @@
 
 namespace Diese.Injection.Factories
 {
-    internal abstract class DependencyFactoryBase : ServiceFactoryBase, IDependencyFactory
+    internal abstract class DependencyFactoryBase : FactoryBase, IDependencyFactory
     {
         protected DependencyFactoryBase(Type type, object serviceKey, Substitution substitution)
             : base(type, serviceKey, substitution)

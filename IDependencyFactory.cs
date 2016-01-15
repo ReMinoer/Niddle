@@ -1,6 +1,6 @@
 ﻿namespace Diese.Injection
 {
-    public interface IDependencyFactory : IServiceFactory
+    public interface IDependencyFactory : IInjectionService
     {
         object Get(IDependencyInjector injector);
     }

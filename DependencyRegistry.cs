@@ -165,7 +165,7 @@ namespace Diese.Injection
         }
 
         private class KeyableServiceRegistry<TValue>
-            where TValue : class, IServiceFactory
+            where TValue : class, IInjectionService
         {
             private readonly Dictionary<Type, TValue> _defaultFactories;
             private readonly Dictionary<KeyedService, TValue> _keyedFactories;
