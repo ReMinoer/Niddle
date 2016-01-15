@@ -2,7 +2,7 @@
 
 namespace Diese.Injection.Factories
 {
-    internal class FuncFactory<TOut> : FactoryBase
+    internal class FuncFactory<TOut> : DependencyFactoryBase
     {
         private readonly Func<TOut> _func;
 
@@ -18,7 +18,7 @@ namespace Diese.Injection.Factories
         }
     }
 
-    internal class FuncFactory<TIn, TOut> : FactoryBase
+    internal class FuncFactory<TIn, TOut> : DependencyFactoryBase
     {
         private readonly Func<TIn, TOut> _func;
 

@@ -2,7 +2,7 @@
 
 namespace Diese.Injection.Factories
 {
-    internal class LinkedFactory : FactoryBase
+    internal class LinkedFactory : DependencyFactoryBase
     {
         private readonly IDependencyFactory _factory;
 

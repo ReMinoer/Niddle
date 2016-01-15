@@ -2,7 +2,7 @@
 
 namespace Diese.Injection.Factories
 {
-    internal class ActionFactory<TIn> : FactoryBase
+    internal class ActionFactory<TIn> : DependencyFactoryBase
     {
         private readonly Action<TIn> _action;
 

@@ -7,7 +7,7 @@ using Diese.Injection.Factories.Data;
 
 namespace Diese.Injection.Factories
 {
-    internal class TransientFactory : FactoryBase
+    internal class TransientFactory : DependencyFactoryBase
     {
         static private readonly Stack<IDependencyFactory> FactoryStack = new Stack<IDependencyFactory>();
         private readonly ConstructorData _constructorData;
@@ -27,7 +27,7 @@ namespace Diese.Injection.Factories
                         x.CustomAttributes.Any(attr => attr.AttributeType == typeof(InjectableAttribute)))
                 .ToArray();
 
-            _propertiesData = new PropertyData[propertyInfos.Count()];
+            _propertiesData = new PropertyData[propertyInfos.Length];
             for (int i = 0; i < _propertiesData.Length; i++)
                 _propertiesData[i] = new PropertyData(propertyInfos[i]);
 
@@ -36,7 +36,7 @@ namespace Diese.Injection.Factories
                     x => x.IsPublic && x.CustomAttributes.Any(attr => attr.AttributeType == typeof(InjectableAttribute)))
                 .ToArray();
 
-            _fieldsData = new FieldData[fieldInfos.Count()];
+            _fieldsData = new FieldData[fieldInfos.Length];
             for (int i = 0; i < _fieldsData.Length; i++)
                 _fieldsData[i] = new FieldData(fieldInfos[i]);
         }

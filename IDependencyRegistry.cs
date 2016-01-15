@@ -13,6 +13,12 @@ namespace Diese.Injection
         void RegisterFunc<TOut>(Func<TOut> func, object serviceKey = null, Substitution substitution = Substitution.Forbidden);
         void RegisterFunc<TIn, TOut>(Func<TIn, TOut> func, object serviceKey = null, Substitution substitution = Substitution.Forbidden);
 
+        void RegisterGeneric(Type genericTypeDescription, Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
+            ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden);
+
+        void RegisterGeneric(Type abstractTypeDescription, Type genericTypeDescription, Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
+            ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden);
+
         void Register<T>(Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
             ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden);
 

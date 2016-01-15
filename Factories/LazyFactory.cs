@@ -2,7 +2,7 @@
 
 namespace Diese.Injection.Factories
 {
-    internal class LazyFactory<T> : FactoryBase
+    internal class LazyFactory<T> : DependencyFactoryBase
     {
         private readonly Lazy<T> _lazy;
 

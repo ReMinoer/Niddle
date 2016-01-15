@@ -2,7 +2,7 @@
 
 namespace Diese.Injection.Factories
 {
-    internal class InstanceFactory : FactoryBase
+    internal class InstanceFactory : DependencyFactoryBase
     {
         private readonly object _instance;
 

@@ -9,31 +9,35 @@ namespace Diese.Injection
 {
     public class DependencyRegistry : IDependencyRegistry
     {
-        private readonly Dictionary<Type, IDependencyFactory> _defaultFactories;
-        private readonly Dictionary<KeyedService, IDependencyFactory> _keyedFactories;
+        private readonly KeyableServiceRegistry<IDependencyFactory> _dependencyFactories;
+        private readonly KeyableServiceRegistry<IGenericFactory> _genericFactories;
 
         public DependencyRegistry()
         {
-            _defaultFactories = new Dictionary<Type, IDependencyFactory>();
-            _keyedFactories = new Dictionary<KeyedService, IDependencyFactory>();
+            _dependencyFactories = new KeyableServiceRegistry<IDependencyFactory>();
+            _genericFactories = new KeyableServiceRegistry<IGenericFactory>();
         }
 
         public IDependencyFactory this[Type type, object serviceKey = null]
         {
             get
             {
-                IDependencyFactory factory;
+                IDependencyFactory factory = _dependencyFactories[type, serviceKey];
 
-                if (serviceKey != null)
+                if (factory == null && type.IsGenericType)
                 {
-                    if (!_keyedFactories.TryGetValue(new KeyedService(type, serviceKey), out factory))
-                        throw new NotRegisterException(type, serviceKey);
-
-                    return factory;
+                    IGenericFactory genericFactory = _genericFactories[type.GetGenericTypeDefinition(), serviceKey];
+                    if (genericFactory != null)
+                        factory = genericFactory.GetFactory(type.GenericTypeArguments);
                 }
 
-                if (!_defaultFactories.TryGetValue(type, out factory))
+                if (factory == null)
+                {
+                    if (serviceKey != null)
+                        throw new NotRegisterException(type, serviceKey);
+
                     throw new NotRegisterException(type);
+                }
 
                 return factory;
             }
@@ -67,6 +71,23 @@ namespace Diese.Injection
         public void RegisterFunc<TIn, TOut>(Func<TIn, TOut> func, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
         {
             AddFactory(new FuncFactory<TIn, TOut>(func, serviceKey, substitution));
+        }
+
+        public void RegisterGeneric(Type genericTypeDescription, Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
+            ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
+        {
+            RegisterGeneric(genericTypeDescription, genericTypeDescription, subsistence, serviceKey, constructor, substitution);
+        }
+
+        public void RegisterGeneric(Type abstractTypeDescription, Type genericTypeDescription, Subsistence subsistence = Subsistence.Transient, object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
+        {
+            IGenericFactory genericFactory = new GenericFactory(abstractTypeDescription, subsistence, serviceKey,
+                constructor ?? GetDefaultConstructor(genericTypeDescription), substitution);
+
+            if (genericFactory.ServiceKey != null)
+                _genericFactories.AddToKeyedFactories(genericFactory);
+            else
+                _genericFactories.AddToDefaultFactories(genericFactory);
         }
 
         public void Register<T>(Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
@@ -115,44 +136,9 @@ namespace Diese.Injection
         private void AddFactory(IDependencyFactory factory)
         {
             if (factory.ServiceKey != null)
-                AddToKeyedFactories(factory);
+                _dependencyFactories.AddToKeyedFactories(factory);
             else
-                AddToDefaultFactories(factory);
-        }
-
-        private void AddToDefaultFactories(IDependencyFactory factory)
-        {
-            Type type = factory.Type;
-
-            if (type == null)
-                throw new NullReferenceException("Registered type is null !");
-
-            if (_defaultFactories.ContainsKey(type))
-            {
-                if (_defaultFactories[type].Substitution == Substitution.Forbidden)
-                    throw new AlreadyRegisterException(type);
-
-                _defaultFactories.Remove(type);
-            }
-
-            _defaultFactories.Add(type, factory);
-        }
-
-        private void AddToKeyedFactories(IDependencyFactory factory)
-        {
-            Type type = factory.Type;
-            object serviceKey = factory.ServiceKey;
-            var keyedService = new KeyedService(type, serviceKey);
-
-            if (_keyedFactories.ContainsKey(keyedService))
-            {
-                if (_keyedFactories[keyedService].Substitution == Substitution.Forbidden)
-                    throw new AlreadyRegisterException(serviceKey);
-
-                _keyedFactories.Remove(keyedService);
-            }
-
-            _keyedFactories.Add(keyedService, factory);
+                _dependencyFactories.AddToDefaultFactories(factory);
         }
 
         static private ConstructorInfo GetDefaultConstructor(Type type)
@@ -175,6 +161,75 @@ namespace Diese.Injection
             public override int GetHashCode()
             {
                 return _type.GetHashCode() ^ _serviceKey.GetHashCode();
+            }
+        }
+
+        private class KeyableServiceRegistry<TValue>
+            where TValue : class, IServiceFactory
+        {
+            private readonly Dictionary<Type, TValue> _defaultFactories;
+            private readonly Dictionary<KeyedService, TValue> _keyedFactories;
+
+            public KeyableServiceRegistry()
+            {
+                _defaultFactories = new Dictionary<Type, TValue>();
+                _keyedFactories = new Dictionary<KeyedService, TValue>();
+            }
+
+            public TValue this[Type type, object serviceKey = null]
+            {
+                get
+                {
+                    TValue factory;
+
+                    if (serviceKey != null)
+                    {
+                        if (_keyedFactories.TryGetValue(new KeyedService(type, serviceKey), out factory))
+                            return factory;
+
+                        return null;
+                    }
+
+                    if (_defaultFactories.TryGetValue(type, out factory))
+                        return factory;
+
+                    return null;
+                }
+            }
+
+            public void AddToDefaultFactories(TValue factory)
+            {
+                Type type = factory.Type;
+
+                if (type == null)
+                    throw new NullReferenceException("Registered type is null !");
+
+                if (_defaultFactories.ContainsKey(type))
+                {
+                    if (_defaultFactories[type].Substitution == Substitution.Forbidden)
+                        throw new AlreadyRegisterException(type);
+
+                    _defaultFactories.Remove(type);
+                }
+
+                _defaultFactories.Add(type, factory);
+            }
+
+            public void AddToKeyedFactories(TValue factory)
+            {
+                Type type = factory.Type;
+                object serviceKey = factory.ServiceKey;
+                var keyedService = new KeyedService(type, serviceKey);
+
+                if (_keyedFactories.ContainsKey(keyedService))
+                {
+                    if (_keyedFactories[keyedService].Substitution == Substitution.Forbidden)
+                        throw new AlreadyRegisterException(serviceKey);
+
+                    _keyedFactories.Remove(keyedService);
+                }
+
+                _keyedFactories.Add(keyedService, factory);
             }
         }
     }

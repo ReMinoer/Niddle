@@ -1,12 +1,7 @@
-﻿using System;
-
-namespace Diese.Injection
+﻿namespace Diese.Injection
 {
-    public interface IDependencyFactory
+    public interface IDependencyFactory : IServiceFactory
     {
-        Type Type { get; }
-        object ServiceKey { get; }
-        Substitution Substitution { get; }
         object Get(IDependencyInjector injector);
     }
 }

@@ -1,20 +1,18 @@
 ﻿using System;
 
-namespace Diese.Injection.Factories
+namespace Diese.Injection
 {
-    internal abstract class FactoryBase : IDependencyFactory
+    internal abstract class ServiceFactoryBase : IServiceFactory
     {
         public Type Type { get; private set; }
         public object ServiceKey { get; private set; }
         public Substitution Substitution { get; private set; }
 
-        protected FactoryBase(Type type, object serviceKey, Substitution substitution)
+        protected ServiceFactoryBase(Type type, object serviceKey, Substitution substitution)
         {
             Type = type;
             ServiceKey = serviceKey;
             Substitution = substitution;
         }
-
-        public abstract object Get(IDependencyInjector injector);
     }
 }
