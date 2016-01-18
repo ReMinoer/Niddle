@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Diese.Injection.Factories.Base;
 
 namespace Diese.Injection.Factories
 {
-    internal class GenericFactory : FactoryBase, IGenericFactory
+    internal class GenericFactory : GenericFactoryBase
     {
         private readonly Dictionary<Type, IDependencyFactory> _dependencyFactories;
         private readonly int _constructorIndex;
@@ -28,7 +29,7 @@ namespace Diese.Injection.Factories
                 }
         }
 
-        public IDependencyFactory GetFactory(Type[] genericTypeArguments)
+        public override IDependencyFactory GetFactory(Type[] genericTypeArguments)
         {
             Type derivedType = Type.MakeGenericType(genericTypeArguments);
 

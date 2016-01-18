@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Diese.Injection.Exceptions;
+using Diese.Injection.Factories.Base;
 using Diese.Injection.Factories.Data;
 
 namespace Diese.Injection.Factories

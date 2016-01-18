@@ -1,4 +1,5 @@
 ﻿using System;
+using Diese.Injection.Factories.Base;
 
 namespace Diese.Injection.Factories
 {

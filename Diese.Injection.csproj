@@ -36,13 +36,15 @@
   <ItemGroup>
     <Compile Include="Exceptions\AlreadyRegisterException.cs" />
     <Compile Include="DependencyRegistry.cs" />
-    <Compile Include="Factories\DependencyFactoryBase.cs" />
+    <Compile Include="Factories\Base\GenericFactoryBase.cs" />
+    <Compile Include="Factories\Base\DependencyFactoryBase.cs" />
     <Compile Include="Factories\FactoryBase.cs" />
     <Compile Include="Factories\FuncFactory.cs" />
     <Compile Include="Factories\Data\FieldData.cs" />
     <Compile Include="Factories\Data\MemberData.cs" />
     <Compile Include="Factories\Data\PropertyData.cs" />
     <Compile Include="Factories\ActionFactory.cs" />
+    <Compile Include="Factories\LinkedGenericFactory.cs" />
     <Compile Include="Factories\LinkedFactory.cs" />
     <Compile Include="Factories\LazyFactory.cs" />
     <Compile Include="Factories\GenericFactory.cs" />

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Diese.Injection.Factories
+namespace Diese.Injection.Factories.Base
 {
     internal abstract class DependencyFactoryBase : FactoryBase, IDependencyFactory
     {
