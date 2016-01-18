@@ -1,5 +1,4 @@
 ﻿using System;
-using Diese.Injection.Exceptions;
 
 namespace Diese.Injection
 {
@@ -17,21 +16,17 @@ namespace Diese.Injection
             return (T)Resolve(typeof(T), serviceKey);
         }
 
-        public object Resolve(Type type, object serviceKey = null)
+        public virtual object Resolve(Type type, object serviceKey = null)
         {
-            object obj;
-            if (TryResolve(out obj, type, serviceKey))
-                return obj;
-
-            throw new NotRegisterException(type, serviceKey);
+            return Registry[type, serviceKey].Get(this);
         }
 
         public bool TryResolve<T>(out T obj, object serviceKey = null)
         {
-            object obj2;
-            if (TryResolve(out obj2, typeof(T), serviceKey))
+            object temp;
+            if (TryResolve(out temp, typeof(T), serviceKey))
             {
-                obj = (T)obj2;
+                obj = (T)temp;
                 return true;
             }
 

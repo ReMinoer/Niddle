@@ -174,7 +174,7 @@ namespace Diese.Injection
             }
         }
 
-        private class KeyableServiceRegistry<TValue>
+        private sealed class KeyableServiceRegistry<TValue>
             where TValue : class, IInjectionService
         {
             private readonly Dictionary<Type, TValue> _defaultFactories;
