@@ -22,25 +22,27 @@ namespace Diese.Injection
         {
             get
             {
-                IDependencyFactory factory = _dependencyFactories[type, serviceKey];
+                IDependencyFactory factory;
 
-                if (factory == null && type.IsGenericType)
-                {
-                    IGenericFactory genericFactory = _genericFactories[type.GetGenericTypeDefinition(), serviceKey];
-                    if (genericFactory != null)
-                        factory = genericFactory.GetFactory(type.GenericTypeArguments);
-                }
+                if (TryGetFactory(out factory, type, serviceKey))
+                    return factory;
 
-                if (factory == null)
-                {
-                    if (serviceKey != null)
-                        throw new NotRegisterException(type, serviceKey);
-
-                    throw new NotRegisterException(type);
-                }
-
-                return factory;
+                throw new NotRegisterException(type, serviceKey);
             }
+        }
+
+        public bool TryGetFactory(out IDependencyFactory factory, Type type, object serviceKey)
+        {
+            factory = _dependencyFactories[type, serviceKey];
+
+            if (factory == null && type.IsGenericType)
+            {
+                IGenericFactory genericFactory = _genericFactories[type.GetGenericTypeDefinition(), serviceKey];
+                if (genericFactory != null)
+                    factory = genericFactory.GetFactory(type.GenericTypeArguments);
+            }
+
+            return factory != null;
         }
 
         public void RegisterInstance<TAbstract>(object instance, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
@@ -50,27 +52,27 @@ namespace Diese.Injection
 
         public void RegisterInstance(Type abstractType, object instance, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
         {
-            AddFactory(new InstanceFactory(abstractType, instance, serviceKey, substitution));
+            AddDependencyFactory(new InstanceFactory(abstractType, instance, serviceKey, substitution));
         }
 
         public void RegisterLazy<T>(Func<T> factory, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
         {
-            AddFactory(new LazyFactory<T>(factory, serviceKey, substitution));
+            AddDependencyFactory(new LazyFactory<T>(factory, serviceKey, substitution));
         }
 
         public void RegisterAction<TIn>(Action<TIn> action, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
         {
-            AddFactory(new ActionFactory<TIn>(action, serviceKey, substitution));
+            AddDependencyFactory(new ActionFactory<TIn>(action, serviceKey, substitution));
         }
 
         public void RegisterFunc<TOut>(Func<TOut> func, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
         {
-            AddFactory(new FuncFactory<TOut>(func, serviceKey, substitution));
+            AddDependencyFactory(new FuncFactory<TOut>(func, serviceKey, substitution));
         }
 
         public void RegisterFunc<TIn, TOut>(Func<TIn, TOut> func, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
         {
-            AddFactory(new FuncFactory<TIn, TOut>(func, serviceKey, substitution));
+            AddDependencyFactory(new FuncFactory<TIn, TOut>(func, serviceKey, substitution));
         }
 
         public void RegisterGeneric(Type genericTypeDescription, Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
@@ -81,13 +83,8 @@ namespace Diese.Injection
 
         public void RegisterGeneric(Type abstractTypeDescription, Type genericTypeDescription, Subsistence subsistence = Subsistence.Transient, object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
         {
-            IGenericFactory genericFactory = new GenericFactory(abstractTypeDescription, subsistence, serviceKey,
-                constructor ?? GetDefaultConstructor(genericTypeDescription), substitution);
-
-            if (genericFactory.ServiceKey != null)
-                _genericFactories.AddToKeyedFactories(genericFactory);
-            else
-                _genericFactories.AddToDefaultFactories(genericFactory);
+            AddGenericFactory(new GenericFactory(abstractTypeDescription, subsistence, serviceKey,
+                constructor ?? GetDefaultConstructor(genericTypeDescription), substitution));
         }
 
         public void Register<T>(Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
@@ -113,10 +110,10 @@ namespace Diese.Injection
             object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
         {
             if (subsistence == Subsistence.Singleton)
-                AddFactory(new SingletonFactory(abstractType, serviceKey,
+                AddDependencyFactory(new SingletonFactory(abstractType, serviceKey,
                     constructor ?? GetDefaultConstructor(implementationType), substitution));
             else
-                AddFactory(new TransientFactory(abstractType, serviceKey,
+                AddDependencyFactory(new TransientFactory(abstractType, serviceKey,
                     constructor ?? GetDefaultConstructor(implementationType), substitution));
         }
 
@@ -130,15 +127,28 @@ namespace Diese.Injection
         public void Link(Type linkedType, Type registeredType, object registeredKey = null, object serviceKey = null,
             Substitution substitution = Substitution.Forbidden)
         {
-            AddFactory(new LinkedFactory(linkedType, this[registeredType, registeredKey], serviceKey, substitution));
+            AddDependencyFactory(new LinkedFactory(linkedType, this[registeredType, registeredKey], serviceKey, substitution));
         }
 
-        private void AddFactory(IDependencyFactory factory)
+        public void LinkGeneric(Type linkedTypeDescription, Type registeredTypeDescription, object registeredKey = null, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
+        {
+            AddGenericFactory(new LinkedGenericFactory(linkedTypeDescription, _genericFactories[registeredTypeDescription, registeredKey], serviceKey, substitution));
+        }
+
+        private void AddDependencyFactory(IDependencyFactory factory)
         {
             if (factory.ServiceKey != null)
                 _dependencyFactories.AddToKeyedFactories(factory);
             else
                 _dependencyFactories.AddToDefaultFactories(factory);
+        }
+
+        private void AddGenericFactory(IGenericFactory genericFactory)
+        {
+            if (genericFactory.ServiceKey != null)
+                _genericFactories.AddToKeyedFactories(genericFactory);
+            else
+                _genericFactories.AddToDefaultFactories(genericFactory);
         }
 
         static private ConstructorInfo GetDefaultConstructor(Type type)

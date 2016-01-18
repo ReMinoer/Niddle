@@ -6,6 +6,7 @@ namespace Diese.Injection
     public interface IDependencyRegistry
     {
         IDependencyFactory this[Type type, object serviceKey = null] { get; }
+        bool TryGetFactory(out IDependencyFactory factory, Type type, object serviceKey);
         void RegisterInstance<TAbstract>(object instance, object serviceKey = null, Substitution substitution = Substitution.Forbidden);
         void RegisterInstance(Type abstractType, object instance, object serviceKey = null, Substitution substitution = Substitution.Forbidden);
         void RegisterLazy<T>(Func<T> factory, object serviceKey = null, Substitution substitution = Substitution.Forbidden);
@@ -37,6 +38,9 @@ namespace Diese.Injection
             where TRegistered : TLinked;
 
         void Link(Type linkedType, Type registeredType, object registeredKey = null, object serviceKey = null,
+            Substitution substitution = Substitution.Forbidden);
+
+        void LinkGeneric(Type linkedTypeDescription, Type registeredTypeDescription, object registeredKey = null, object serviceKey = null,
             Substitution substitution = Substitution.Forbidden);
     }
 }

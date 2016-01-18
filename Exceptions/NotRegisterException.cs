@@ -7,13 +7,8 @@ namespace Diese.Injection.Exceptions
         private const string TypeMessage = "Type \"{0}\" is not registered !";
         private const string KeyMessage = "Type \"{0}\" keyed \"{1}\" is not registered !";
 
-        public NotRegisterException(Type type)
-            : base(string.Format(TypeMessage, type.Name))
-        {
-        }
-
         public NotRegisterException(Type type, object key)
-            : base(string.Format(KeyMessage, type, key))
+            : base(key == null ? string.Format(TypeMessage, type.Name) : string.Format(KeyMessage, type, key))
         {
         }
 
