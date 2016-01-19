@@ -87,6 +87,16 @@ namespace Diese.Injection
                 constructor ?? GetDefaultConstructor(genericTypeDescription), substitution));
         }
 
+        public void Register<TAbstract, TImplementation>(Subsistence subsistence = Subsistence.Transient, object serviceKey = null, Substitution substitution = Substitution.Forbidden) where TImplementation : TAbstract
+        {
+            Register(typeof(TAbstract), typeof(TImplementation), subsistence, serviceKey, substitution);
+        }
+
+        public void Register(Type abstractType, Type implementationType, Subsistence subsistence = Subsistence.Transient, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
+        {
+            Register(abstractType, subsistence, serviceKey, GetDefaultConstructor(implementationType), substitution);
+        }
+
         public void Register<T>(Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
             ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
         {
@@ -96,25 +106,10 @@ namespace Diese.Injection
         public void Register(Type type, Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
             ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
         {
-            Register(type, type, subsistence, serviceKey, constructor, substitution);
-        }
-
-        public void Register<TAbstract, TImplementation>(Subsistence subsistence = Subsistence.Transient,
-            object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
-            where TImplementation : TAbstract
-        {
-            Register(typeof(TAbstract), typeof(TImplementation), subsistence, serviceKey, constructor, substitution);
-        }
-
-        public void Register(Type abstractType, Type implementationType, Subsistence subsistence = Subsistence.Transient,
-            object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
-        {
             if (subsistence == Subsistence.Singleton)
-                AddDependencyFactory(new SingletonFactory(abstractType, serviceKey,
-                    constructor ?? GetDefaultConstructor(implementationType), substitution));
+                AddDependencyFactory(new SingletonFactory(type, serviceKey, constructor ?? GetDefaultConstructor(type), substitution));
             else
-                AddDependencyFactory(new TransientFactory(abstractType, serviceKey,
-                    constructor ?? GetDefaultConstructor(implementationType), substitution));
+                AddDependencyFactory(new TransientFactory(type, serviceKey, constructor ?? GetDefaultConstructor(type), substitution));
         }
 
         public void Link<TLinked, TRegistered>(object registeredKey = null, object serviceKey = null,

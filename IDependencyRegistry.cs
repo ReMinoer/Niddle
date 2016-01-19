@@ -20,18 +20,18 @@ namespace Diese.Injection
         void RegisterGeneric(Type abstractTypeDescription, Type genericTypeDescription, Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
             ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden);
 
+        void Register<TAbstract, TImplementation>(Subsistence subsistence = Subsistence.Transient,
+            object serviceKey = null, Substitution substitution = Substitution.Forbidden)
+            where TImplementation : TAbstract;
+
+        void Register(Type abstractType, Type implementationType, Subsistence subsistence = Subsistence.Transient,
+            object serviceKey = null, Substitution substitution = Substitution.Forbidden);
+
         void Register<T>(Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
             ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden);
 
         void Register(Type type, Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
             ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden);
-
-        void Register<TAbstract, TImplementation>(Subsistence subsistence = Subsistence.Transient,
-            object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
-            where TImplementation : TAbstract;
-
-        void Register(Type abstractType, Type implementationType, Subsistence subsistence = Subsistence.Transient,
-            object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden);
 
         void Link<TLinked, TRegistered>(object registeredKey = null, object serviceKey = null,
             Substitution substitution = Substitution.Forbidden)
