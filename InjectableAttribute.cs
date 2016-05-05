@@ -2,7 +2,7 @@
 
 namespace Diese.Injection
 {
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Parameter)]
     public class InjectableAttribute : Attribute
     {
     }

@@ -13,10 +13,15 @@ namespace Diese.Injection
 
         public T Resolve<T>(object serviceKey = null)
         {
-            return (T)Resolve(typeof(T), serviceKey);
+            return (T)Resolve(typeof(T), null, serviceKey);
         }
 
-        public virtual object Resolve(Type type, object serviceKey = null)
+        public object Resolve(Type type, object serviceKey = null)
+        {
+            return Resolve(type, null, serviceKey);
+        }
+        
+        public virtual object Resolve(Type type, InjectableAttribute injectableAttribute, object serviceKey = null)
         {
             return Registry[type, serviceKey].Get(this);
         }
@@ -24,7 +29,7 @@ namespace Diese.Injection
         public bool TryResolve<T>(out T obj, object serviceKey = null)
         {
             object temp;
-            if (TryResolve(out temp, typeof(T), serviceKey))
+            if (TryResolve(out temp, typeof(T), null, serviceKey))
             {
                 obj = (T)temp;
                 return true;
@@ -34,7 +39,12 @@ namespace Diese.Injection
             return false;
         }
 
-        public virtual bool TryResolve(out object obj, Type type, object serviceKey = null)
+        public bool TryResolve(out object obj, Type type, object serviceKey = null)
+        {
+            return TryResolve(out obj, type, null, serviceKey);
+        }
+
+        public virtual bool TryResolve(out object obj, Type type, InjectableAttribute injectableAttribute, object serviceKey = null)
         {
             IDependencyFactory factory;
             if (!Registry.TryGetFactory(out factory, type, serviceKey))

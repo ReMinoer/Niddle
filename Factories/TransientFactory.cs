@@ -54,28 +54,24 @@ namespace Diese.Injection.Factories
             for (int i = 0; i < parameters.Length; i++)
             {
                 ParameterData data = _constructorData.ParametersData[i];
-                parameters[i] = injector.Resolve(data.Type, data.ServiceKey);
+                parameters[i] = injector.Resolve(data.Type, data.InjectableAttribute, data.ServiceKey);
             }
 
             object instance = _constructorData.ConstructorInfo.Invoke(parameters);
 
             foreach (FieldData field in _fieldsData)
-                try
-                {
-                    field.FieldInfo.SetValue(instance, injector.Resolve(field.Type, field.ServiceKey));
-                }
-                catch (NotRegisterException)
-                {
-                }
+            {
+                object value;
+                injector.TryResolve(out value, field.Type, field.InjectableAttribute, field.ServiceKey);
+                field.FieldInfo.SetValue(instance, value);
+            }
 
             foreach (PropertyData property in _propertiesData)
-                try
-                {
-                    property.PropertyInfo.SetValue(instance, injector.Resolve(property.Type, property.ServiceKey));
-                }
-                catch (NotRegisterException)
-                {
-                }
+            {
+                object value;
+                injector.TryResolve(out value, property.Type, property.InjectableAttribute, property.ServiceKey);
+                property.PropertyInfo.SetValue(instance, value);
+            }
 
             _alreadyInvoke = false;
             FactoryStack.Pop();

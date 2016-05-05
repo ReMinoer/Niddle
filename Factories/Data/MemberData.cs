@@ -8,6 +8,7 @@ namespace Diese.Injection.Factories.Data
     {
         public Type Type { get; private set; }
         public object ServiceKey { get; private set; }
+        public InjectableAttribute InjectableAttribute { get; private set; }
 
         public MemberData(Type type, MemberInfo memberInfo)
         {
@@ -16,6 +17,8 @@ namespace Diese.Injection.Factories.Data
             Attribute[] attributes = memberInfo.GetCustomAttributes(typeof(ServiceKeyAttribute)).ToArray();
             if (attributes.Length > 0)
                 ServiceKey = ((ServiceKeyAttribute)attributes.First()).Key;
+
+            InjectableAttribute = memberInfo.GetCustomAttribute<InjectableAttribute>();
         }
     }
 }
