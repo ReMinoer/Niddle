@@ -14,10 +14,7 @@ namespace Diese.Injection.Factories.Data
         {
             Type = type;
 
-            Attribute[] attributes = memberInfo.GetCustomAttributes(typeof(ServiceKeyAttribute)).ToArray();
-            if (attributes.Length > 0)
-                ServiceKey = ((ServiceKeyAttribute)attributes.First()).Key;
-
+            ServiceKey = memberInfo.GetCustomAttribute<ServiceKeyAttribute>()?.Key;
             InjectableAttribute = memberInfo.GetCustomAttribute<InjectableAttribute>();
         }
     }

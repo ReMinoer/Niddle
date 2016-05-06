@@ -22,10 +22,7 @@ namespace Diese.Injection.Factories
             _constructorData = new ConstructorData(constructorInfo);
 
             PropertyInfo[] propertyInfos = type.GetProperties()
-                .Where(
-                    x =>
-                        x.SetMethod != null && x.SetMethod.IsPublic &&
-                        x.CustomAttributes.Any(attr => attr.AttributeType == typeof(InjectableAttribute)))
+                .Where(x => x.SetMethod != null && x.SetMethod.IsPublic && x.GetCustomAttribute<InjectableAttribute>() != null)
                 .ToArray();
 
             _propertiesData = new PropertyData[propertyInfos.Length];
@@ -33,8 +30,7 @@ namespace Diese.Injection.Factories
                 _propertiesData[i] = new PropertyData(propertyInfos[i]);
 
             FieldInfo[] fieldInfos = type.GetFields()
-                .Where(
-                    x => x.IsPublic && x.CustomAttributes.Any(attr => attr.AttributeType == typeof(InjectableAttribute)))
+                .Where(x => x.IsPublic && x.GetCustomAttribute<InjectableAttribute>() != null)
                 .ToArray();
 
             _fieldsData = new FieldData[fieldInfos.Length];
