@@ -16,6 +16,11 @@ namespace Diese.Injection
             return (T)Resolve(typeof(T), null, serviceKey);
         }
 
+        public T Resolve<T>(InjectableAttribute injectableAttribute, object serviceKey = null)
+        {
+            return (T)Resolve(typeof(T), injectableAttribute, serviceKey);
+        }
+
         public object Resolve(Type type, object serviceKey = null)
         {
             return Resolve(type, null, serviceKey);
@@ -30,6 +35,19 @@ namespace Diese.Injection
         {
             object temp;
             if (TryResolve(out temp, typeof(T), null, serviceKey))
+            {
+                obj = (T)temp;
+                return true;
+            }
+
+            obj = default(T);
+            return false;
+        }
+
+        public bool TryResolve<T>(out T obj, InjectableAttribute injectableAttribute, object serviceKey = null)
+        {
+            object temp;
+            if (TryResolve(out temp, typeof(T), injectableAttribute, serviceKey))
             {
                 obj = (T)temp;
                 return true;
