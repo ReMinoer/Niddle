@@ -50,7 +50,14 @@ namespace Diese.Injection.Factories
             for (int i = 0; i < parameters.Length; i++)
             {
                 ParameterData data = _constructorData.ParametersData[i];
-                parameters[i] = injector.Resolve(data.Type, data.InjectableAttribute, data.ServiceKey);
+
+                if (data.HasDefaultValue)
+                {
+                    if (!injector.TryResolve(out parameters[i], data.Type, data.InjectableAttribute, data.ServiceKey))
+                        parameters[i] = data.DefaultValue;
+                }
+                else
+                    parameters[i] = injector.Resolve(data.Type, data.InjectableAttribute, data.ServiceKey);
             }
 
             object instance = _constructorData.ConstructorInfo.Invoke(parameters);
