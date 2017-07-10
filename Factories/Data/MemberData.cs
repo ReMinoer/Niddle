@@ -7,14 +7,14 @@ namespace Diese.Injection.Factories.Data
     {
         public Type Type { get; private set; }
         public object ServiceKey { get; private set; }
-        public InjectableAttribute InjectableAttribute { get; private set; }
+        public InjectableAttributeBase InjectableAttribute { get; private set; }
 
         public MemberData(Type type, MemberInfo memberInfo)
         {
             Type = type;
 
             ServiceKey = memberInfo.GetCustomAttribute<ServiceKeyAttribute>()?.Key;
-            InjectableAttribute = memberInfo.GetCustomAttribute<InjectableAttribute>();
+            InjectableAttribute = memberInfo.GetCustomAttribute<InjectableAttributeBase>();
         }
     }
 }

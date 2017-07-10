@@ -8,7 +8,7 @@ namespace Diese.Injection.Factories.Data
     {
         public Type Type { get; private set; }
         public object ServiceKey { get; private set; }
-        public InjectableAttribute InjectableAttribute { get; private set; }
+        public InjectableAttributeBase InjectableAttribute { get; private set; }
         public bool HasDefaultValue { get; private set; }
         public object DefaultValue { get; private set; }
 
@@ -20,7 +20,7 @@ namespace Diese.Injection.Factories.Data
             if (attributes.Length > 0)
                 ServiceKey = ((ServiceKeyAttribute)attributes.First()).Key;
 
-            InjectableAttribute = parameterInfo.GetCustomAttribute<InjectableAttribute>();
+            InjectableAttribute = parameterInfo.GetCustomAttribute<InjectableAttributeBase>();
 
             HasDefaultValue = parameterInfo.HasDefaultValue;
             if (HasDefaultValue)

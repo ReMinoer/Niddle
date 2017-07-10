@@ -1,9 +1,17 @@
-﻿using System;
+﻿using System.Reflection;
 
 namespace Diese.Injection
 {
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Parameter)]
-    public class InjectableAttribute : Attribute
+    public class InjectableAttribute : InjectableAttributeBase
     {
+        public override sealed void Inject(PropertyInfo propertyInfo, object obj, object value)
+        {
+            propertyInfo.SetValue(obj, value);
+        }
+
+        public override sealed void Inject(FieldInfo fieldInfo, object obj, object value)
+        {
+            fieldInfo.SetValue(obj, value);
+        }
     }
 }

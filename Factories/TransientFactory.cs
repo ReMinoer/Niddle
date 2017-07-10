@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -22,7 +23,7 @@ namespace Diese.Injection.Factories
             _constructorData = new ConstructorData(constructorInfo);
 
             PropertyInfo[] propertyInfos = type.GetProperties()
-                .Where(x => x.SetMethod != null && x.SetMethod.IsPublic && x.GetCustomAttribute<InjectableAttribute>() != null)
+                .Where(x => (x.SetMethod != null && x.SetMethod.IsPublic || x.GetMethod != null && x.GetMethod.IsPublic) && x.CustomAttributes.Any(y => typeof(InjectableAttributeBase).IsAssignableFrom(y.AttributeType)))
                 .ToArray();
 
             _propertiesData = new PropertyData[propertyInfos.Length];
@@ -30,7 +31,7 @@ namespace Diese.Injection.Factories
                 _propertiesData[i] = new PropertyData(propertyInfos[i]);
 
             FieldInfo[] fieldInfos = type.GetFields()
-                .Where(x => x.IsPublic && x.GetCustomAttribute<InjectableAttribute>() != null)
+                .Where(x => x.IsPublic && x.CustomAttributes.Any(y => typeof(InjectableAttributeBase).IsAssignableFrom(y.AttributeType)))
                 .ToArray();
 
             _fieldsData = new FieldData[fieldInfos.Length];
@@ -50,7 +51,7 @@ namespace Diese.Injection.Factories
             for (int i = 0; i < parameters.Length; i++)
             {
                 ParameterData data = _constructorData.ParametersData[i];
-
+                
                 if (data.HasDefaultValue)
                 {
                     if (!injector.TryResolve(out parameters[i], data.Type, data.InjectableAttribute, data.ServiceKey))
@@ -64,16 +65,30 @@ namespace Diese.Injection.Factories
 
             foreach (FieldData field in _fieldsData)
             {
-                object value;
-                injector.TryResolve(out value, field.Type, field.InjectableAttribute, field.ServiceKey);
-                field.FieldInfo.SetValue(instance, value);
+                if (field.InjectableAttribute is IInjectableManyAttribute manyAttribute)
+                {
+                    injector.TryResolveMany(out IEnumerable values, manyAttribute.GetInjectedType(field.Type), field.InjectableAttribute, field.ServiceKey);
+                    manyAttribute.Inject(field.FieldInfo, instance, values);
+                }
+                else
+                {
+                    injector.TryResolve(out object value, field.Type, field.InjectableAttribute, field.ServiceKey);
+                    field.InjectableAttribute.Inject(field.FieldInfo, instance, value);
+                }
             }
 
             foreach (PropertyData property in _propertiesData)
             {
-                object value;
-                injector.TryResolve(out value, property.Type, property.InjectableAttribute, property.ServiceKey);
-                property.PropertyInfo.SetValue(instance, value);
+                if (property.InjectableAttribute is IInjectableManyAttribute manyAttribute)
+                {
+                    injector.TryResolveMany(out IEnumerable values, manyAttribute.GetInjectedType(property.Type), property.InjectableAttribute, property.ServiceKey);
+                    manyAttribute.Inject(property.PropertyInfo, instance, values);
+                }
+                else
+                {
+                    injector.TryResolve(out object value, property.Type, property.InjectableAttribute, property.ServiceKey);
+                    property.InjectableAttribute.Inject(property.PropertyInfo, instance, value);
+                }
             }
 
             _alreadyInvoke = false;
