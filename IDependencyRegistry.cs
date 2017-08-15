@@ -7,7 +7,7 @@ namespace Diese.Injection
     {
         IDependencyFactory this[Type type, object serviceKey = null] { get; }
         bool TryGetFactory(out IDependencyFactory factory, Type type, object serviceKey);
-        void RegisterInstance<TAbstract>(object instance, object serviceKey = null, Substitution substitution = Substitution.Forbidden);
+        void RegisterInstance<TAbstract>(TAbstract instance, object serviceKey = null, Substitution substitution = Substitution.Forbidden);
         void RegisterInstance(Type abstractType, object instance, object serviceKey = null, Substitution substitution = Substitution.Forbidden);
         void RegisterLazy<T>(Func<T> factory, object serviceKey = null, Substitution substitution = Substitution.Forbidden);
         void RegisterAction<TIn>(Action<TIn> action, object serviceKey = null, Substitution substitution = Substitution.Forbidden);
@@ -21,11 +21,11 @@ namespace Diese.Injection
             ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden);
 
         void Register<TAbstract, TImplementation>(Subsistence subsistence = Subsistence.Transient,
-            object serviceKey = null, Substitution substitution = Substitution.Forbidden)
+            object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
             where TImplementation : TAbstract;
 
         void Register(Type abstractType, Type implementationType, Subsistence subsistence = Subsistence.Transient,
-            object serviceKey = null, Substitution substitution = Substitution.Forbidden);
+            object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden);
 
         void Register<T>(Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
             ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden);

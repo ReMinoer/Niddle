@@ -45,7 +45,7 @@ namespace Diese.Injection
             return factory != null;
         }
 
-        public void RegisterInstance<TAbstract>(object instance, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
+        public void RegisterInstance<TAbstract>(TAbstract instance, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
         {
             RegisterInstance(typeof(TAbstract), instance, serviceKey, substitution);
         }
@@ -87,14 +87,17 @@ namespace Diese.Injection
                 constructor ?? GetDefaultConstructor(genericTypeDescription), substitution));
         }
 
-        public void Register<TAbstract, TImplementation>(Subsistence subsistence = Subsistence.Transient, object serviceKey = null, Substitution substitution = Substitution.Forbidden) where TImplementation : TAbstract
+        public void Register<TAbstract, TImplementation>(Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
+            ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
+            where TImplementation : TAbstract
         {
-            Register(typeof(TAbstract), typeof(TImplementation), subsistence, serviceKey, substitution);
+            Register(typeof(TAbstract), typeof(TImplementation), subsistence, serviceKey, constructor, substitution);
         }
 
-        public void Register(Type abstractType, Type implementationType, Subsistence subsistence = Subsistence.Transient, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
+        public void Register(Type abstractType, Type implementationType, Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
+            ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
         {
-            Register(abstractType, subsistence, serviceKey, GetDefaultConstructor(implementationType), substitution);
+            Register(abstractType, subsistence, serviceKey, constructor ?? GetDefaultConstructor(implementationType), substitution);
         }
 
         public void Register<T>(Subsistence subsistence = Subsistence.Transient, object serviceKey = null,
