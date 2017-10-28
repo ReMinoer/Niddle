@@ -60,14 +60,15 @@
     <Compile Include="Factories\Data\ConstructorData.cs" />
     <Compile Include="Factories\InstanceFactory.cs" />
     <Compile Include="Factories\SingletonFactory.cs" />
-    <Compile Include="Factories\TransientFactory.cs" />
+    <Compile Include="Factories\NewInstanceFactory.cs" />
     <Compile Include="IDependencyRegistry.cs" />
     <Compile Include="IDependencyInjector.cs" />
     <Compile Include="IDependencyFactory.cs" />
     <Compile Include="Exceptions\NotRegisterException.cs" />
     <Compile Include="ServiceKeyAttribute.cs" />
-    <Compile Include="Subsistence.cs" />
+    <Compile Include="InstanceOrigin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="InstanceOrigins.cs" />
     <Compile Include="Substitution.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

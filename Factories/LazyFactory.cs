@@ -6,6 +6,7 @@ namespace Diese.Injection.Factories
     internal class LazyFactory<T> : DependencyFactoryBase
     {
         private readonly Lazy<T> _lazy;
+        public override InstanceOrigin InstanceOrigin => InstanceOrigin.Registration;
 
         public LazyFactory(Func<T> factory, object serviceKey, Substitution substitution)
             : base(typeof(Lazy<T>), serviceKey, substitution)

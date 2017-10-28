@@ -6,6 +6,7 @@ namespace Diese.Injection.Factories
     internal class ActionFactory<TIn> : DependencyFactoryBase
     {
         private readonly Action<TIn> _action;
+        public override InstanceOrigin InstanceOrigin => InstanceOrigin.Registration;
 
         public ActionFactory(Action<TIn> action, object serviceKey, Substitution substitution)
             : base(action.GetType(), serviceKey, substitution)

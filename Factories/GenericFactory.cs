@@ -9,13 +9,13 @@ namespace Diese.Injection.Factories
     {
         private readonly Dictionary<Type, IDependencyFactory> _dependencyFactories;
         private readonly int _constructorIndex;
-        public Subsistence Subsistence { get; private set; }
-        public ConstructorInfo Constructor { get; private set; }
+        public override InstanceOrigin InstanceOrigin { get; }
+        public ConstructorInfo Constructor { get; }
 
-        public GenericFactory(Type genericTypeDescription, Subsistence subsistence, object serviceKey, ConstructorInfo constructor, Substitution substitution)
+        public GenericFactory(Type genericTypeDescription, InstanceOrigin instanceOrigin, object serviceKey, ConstructorInfo constructor, Substitution substitution)
             : base(genericTypeDescription, serviceKey, substitution)
         {
-            Subsistence = subsistence;
+            InstanceOrigin = instanceOrigin;
             Constructor = constructor;
 
             _dependencyFactories = new Dictionary<Type, IDependencyFactory>();
@@ -38,9 +38,18 @@ namespace Diese.Injection.Factories
 
             ConstructorInfo derivedConstructor = derivedType.GetConstructors()[_constructorIndex];
 
-            IDependencyFactory factory = Subsistence == Subsistence.Singleton
-                ? new SingletonFactory(derivedType, null, derivedConstructor, Substitution.Forbidden)
-                : new TransientFactory(derivedType, null, derivedConstructor, Substitution.Forbidden);
+            IDependencyFactory factory;
+            switch (InstanceOrigin)
+            {
+                case InstanceOrigin.Instantiation:
+                    factory = new NewInstanceFactory(derivedType, null, derivedConstructor, Substitution.Forbidden);
+                    break;
+                case InstanceOrigin.Registration:
+                    factory = new SingletonFactory(derivedType, null, derivedConstructor, Substitution.Forbidden);
+                    break;
+                default:
+                    throw new ArgumentException();
+            }
 
             _dependencyFactories.Add(derivedType, factory);
             return factory;

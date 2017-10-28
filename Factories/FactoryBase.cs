@@ -4,9 +4,10 @@ namespace Diese.Injection.Factories
 {
     internal abstract class FactoryBase : IInjectionService
     {
-        public Type Type { get; private set; }
-        public object ServiceKey { get; private set; }
-        public Substitution Substitution { get; private set; }
+        public Type Type { get; }
+        public object ServiceKey { get; }
+        public Substitution Substitution { get; }
+        public abstract InstanceOrigin InstanceOrigin { get; }
 
         protected FactoryBase(Type type, object serviceKey, Substitution substitution)
         {

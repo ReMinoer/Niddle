@@ -6,6 +6,7 @@ namespace Diese.Injection.Factories
     internal class LinkedGenericFactory : GenericFactoryBase
     {
         private readonly IGenericFactory _factory;
+        public override InstanceOrigin InstanceOrigin => _factory.InstanceOrigin;
 
         public LinkedGenericFactory(Type type, IGenericFactory factory, object serviceKey, Substitution substitution)
             : base(type, serviceKey, substitution)

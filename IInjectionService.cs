@@ -7,5 +7,6 @@ namespace Diese.Injection
         Type Type { get; }
         object ServiceKey { get; }
         Substitution Substitution { get; }
+        InstanceOrigin InstanceOrigin { get; }
     }
 }

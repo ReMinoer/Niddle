@@ -9,6 +9,54 @@ namespace Diese.Injection
 {
     static public class DependencyInjectorExtension
     {
+        static public IDependencyInjector With<TAbstract, TImplementation>(this IDependencyInjector injector, ConstructorInfo constructor = null)
+            where TImplementation : TAbstract
+            => With(injector, typeof(TAbstract), typeof(TImplementation), constructor);
+
+        static public IDependencyInjector With(this IDependencyInjector injector, Type abstractType, Type implementationType, ConstructorInfo constructor = null)
+            => With(injector, abstractType, constructor ?? GetDefaultConstructor(implementationType));
+
+        static public IDependencyInjector With<T>(this IDependencyInjector injector, ConstructorInfo constructor = null)
+            => With(injector, typeof(T), constructor);
+
+        static public IDependencyInjector With(this IDependencyInjector injector, Type type, ConstructorInfo constructor = null)
+        {
+            return new DepedencyInjectorFactoryExtension(injector, new NewInstanceFactory(type, null, constructor ?? GetDefaultConstructor(type), Substitution.Forbidden));
+        }
+        
+        static public IDependencyInjector WithSingleton<TAbstract, TImplementation>(this IDependencyInjector injector, ConstructorInfo constructor = null)
+            where TImplementation : TAbstract
+            => WithSingleton(injector, typeof(TAbstract), typeof(TImplementation), constructor);
+
+        static public IDependencyInjector WithSingleton(this IDependencyInjector injector, Type abstractType, Type implementationType, ConstructorInfo constructor = null)
+            => WithSingleton(injector, abstractType, constructor ?? GetDefaultConstructor(implementationType));
+
+        static public IDependencyInjector WithSingleton<T>(this IDependencyInjector injector, ConstructorInfo constructor = null)
+            => WithSingleton(injector, typeof(T), constructor);
+
+        static public IDependencyInjector WithSingleton(this IDependencyInjector injector, Type type, ConstructorInfo constructor = null)
+        {
+            return new DepedencyInjectorFactoryExtension(injector, new SingletonFactory(type, null, constructor ?? GetDefaultConstructor(type), Substitution.Forbidden));
+        }
+
+        static public IDependencyInjector WithGeneric(this IDependencyInjector injector, Type genericTypeDescription, ConstructorInfo constructor = null)
+            => WithGeneric(injector, genericTypeDescription, genericTypeDescription, constructor);
+
+        static public IDependencyInjector WithGeneric(this IDependencyInjector injector, Type abstractTypeDescription, Type genericTypeDescription, ConstructorInfo constructor = null)
+        {
+            return new DepedencyInjectorGenericExtension(injector, new GenericFactory(abstractTypeDescription, InstanceOrigin.Instantiation, null,
+                constructor ?? GetDefaultConstructor(genericTypeDescription), Substitution.Forbidden));
+        }
+
+        static public IDependencyInjector WithGenericSingleton(this IDependencyInjector injector, Type genericTypeDescription, ConstructorInfo constructor = null)
+            => WithGenericSingleton(injector, genericTypeDescription, genericTypeDescription, constructor);
+
+        static public IDependencyInjector WithGenericSingleton(this IDependencyInjector injector, Type abstractTypeDescription, Type genericTypeDescription, ConstructorInfo constructor = null)
+        {
+            return new DepedencyInjectorGenericExtension(injector, new GenericFactory(abstractTypeDescription, InstanceOrigin.Registration, null,
+                constructor ?? GetDefaultConstructor(genericTypeDescription), Substitution.Forbidden));
+        }
+
         static public IDependencyInjector WithInstance<TAbstract>(this IDependencyInjector injector, TAbstract instance)
         {
             return new DepedencyInjectorFactoryExtension(injector, new InstanceFactory(typeof(TAbstract), instance, null, Substitution.Forbidden));
@@ -37,41 +85,6 @@ namespace Diese.Injection
         static public IDependencyInjector WithFunc<TIn, TOut>(this IDependencyInjector injector, Func<TIn, TOut> func)
         {
             return new DepedencyInjectorFactoryExtension(injector, new FuncFactory<TIn, TOut>(func, null, Substitution.Forbidden));
-        }
-
-        static public IDependencyInjector WithGeneric(this IDependencyInjector injector, Type genericTypeDescription, Subsistence subsistence = Subsistence.Transient, ConstructorInfo constructor = null)
-        {
-            return WithGeneric(injector, genericTypeDescription, genericTypeDescription, subsistence, constructor);
-        }
-
-        static public IDependencyInjector WithGeneric(this IDependencyInjector injector, Type abstractTypeDescription, Type genericTypeDescription, Subsistence subsistence = Subsistence.Transient, ConstructorInfo constructor = null)
-        {
-            return new DepedencyInjectorGenericExtension(injector, new GenericFactory(abstractTypeDescription, subsistence, null,
-                constructor ?? GetDefaultConstructor(genericTypeDescription), Substitution.Forbidden));
-        }
-
-        static public IDependencyInjector With<TAbstract, TImplementation>(this IDependencyInjector injector, Subsistence subsistence = Subsistence.Transient, ConstructorInfo constructor = null)
-            where TImplementation : TAbstract
-        {
-            return With(injector, typeof(TAbstract), typeof(TImplementation), subsistence, constructor);
-        }
-
-        static public IDependencyInjector With(this IDependencyInjector injector, Type abstractType, Type implementationType, Subsistence subsistence = Subsistence.Transient, ConstructorInfo constructor = null)
-        {
-            return With(injector, abstractType, subsistence, constructor ?? GetDefaultConstructor(implementationType));
-        }
-
-        static public IDependencyInjector With<T>(this IDependencyInjector injector, Subsistence subsistence = Subsistence.Transient, ConstructorInfo constructor = null)
-        {
-            return With(injector, typeof(T), subsistence, constructor);
-        }
-
-        static public IDependencyInjector With(this IDependencyInjector injector, Type type, Subsistence subsistence = Subsistence.Transient, ConstructorInfo constructor = null)
-        {
-            if (subsistence == Subsistence.Singleton)
-                return new DepedencyInjectorFactoryExtension(injector, new SingletonFactory(type, null, constructor ?? GetDefaultConstructor(type), Substitution.Forbidden));
-            else
-                return new DepedencyInjectorFactoryExtension(injector, new TransientFactory(type, null, constructor ?? GetDefaultConstructor(type), Substitution.Forbidden));
         }
 
         static public IDependencyInjector WithLink<TLinked, TRegistered>(this IDependencyInjector injector, object registeredKey = null)
@@ -159,7 +172,7 @@ namespace Diese.Injection
 
         protected override object ResolveExtension(Type type, IDependencyInjector dependencyInjector)
         {
-            return Injector.Resolve(RegisteredType, null, RegisteredKey, dependencyInjector ?? this);
+            return Injector.Resolve(RegisteredType, null, RegisteredKey, InstanceOrigins.All, dependencyInjector ?? this);
         }
     }
 
@@ -184,7 +197,7 @@ namespace Diese.Injection
 
         protected override object ResolveExtension(Type type, IDependencyInjector dependencyInjector)
         {
-            return Injector.Resolve(RegisteredTypeDescription.MakeGenericType(type.GenericTypeArguments), null, RegisteredKey, dependencyInjector ?? this);
+            return Injector.Resolve(RegisteredTypeDescription.MakeGenericType(type.GenericTypeArguments), null, RegisteredKey, InstanceOrigins.All, dependencyInjector ?? this);
         }
     }
 
@@ -200,41 +213,41 @@ namespace Diese.Injection
         protected abstract bool CheckType(Type type);
         protected abstract object ResolveExtension(Type type, IDependencyInjector dependencyInjector);
 
-        public T Resolve<T>(InjectableAttributeBase injectableAttribute = null, object serviceKey = null, IDependencyInjector dependencyInjector = null)
+        public T Resolve<T>(InjectableAttributeBase injectableAttribute = null, object serviceKey = null, InstanceOrigins instanceOrigins = InstanceOrigins.All, IDependencyInjector dependencyInjector = null)
         {
             if (CheckType(typeof(T)))
                 return (T)ResolveExtension(typeof(T), dependencyInjector ?? this);
 
-            return Injector.Resolve<T>(injectableAttribute, serviceKey, dependencyInjector ?? this);
+            return Injector.Resolve<T>(injectableAttribute, serviceKey, instanceOrigins, dependencyInjector ?? this);
         }
 
-        public object Resolve(Type type, InjectableAttributeBase injectableAttribute = null, object serviceKey = null, IDependencyInjector dependencyInjector = null)
+        public object Resolve(Type type, InjectableAttributeBase injectableAttribute = null, object serviceKey = null, InstanceOrigins instanceOrigins = InstanceOrigins.All, IDependencyInjector dependencyInjector = null)
         {
             if (CheckType(type))
                 return ResolveExtension(type, dependencyInjector ?? this);
 
-            return Injector.Resolve(type, injectableAttribute, serviceKey, dependencyInjector ?? this);
+            return Injector.Resolve(type, injectableAttribute, serviceKey, instanceOrigins, dependencyInjector ?? this);
         }
 
-        public IEnumerable<T> ResolveMany<T>(InjectableAttributeBase injectableAttribute = null, object serviceKey = null, IDependencyInjector dependencyInjector = null)
+        public IEnumerable<T> ResolveMany<T>(InjectableAttributeBase injectableAttribute = null, object serviceKey = null, InstanceOrigins instanceOrigins = InstanceOrigins.All, IDependencyInjector dependencyInjector = null)
         {
             if (CheckType(typeof(T)))
                 yield return (T)ResolveExtension(typeof(T), dependencyInjector ?? this);
 
-            foreach (T item in Injector.ResolveMany<T>(injectableAttribute, serviceKey, dependencyInjector ?? this))
+            foreach (T item in Injector.ResolveMany<T>(injectableAttribute, serviceKey, instanceOrigins, dependencyInjector ?? this))
                 yield return item;
         }
 
-        public IEnumerable ResolveMany(Type type, InjectableAttributeBase injectableAttribute = null, object serviceKey = null, IDependencyInjector dependencyInjector = null)
+        public IEnumerable ResolveMany(Type type, InjectableAttributeBase injectableAttribute = null, object serviceKey = null, InstanceOrigins instanceOrigins = InstanceOrigins.All, IDependencyInjector dependencyInjector = null)
         {
             if (CheckType(type))
                 yield return ResolveExtension(type, dependencyInjector ?? this);
 
-            foreach (object item in Injector.ResolveMany(type, injectableAttribute, serviceKey, dependencyInjector ?? this))
+            foreach (object item in Injector.ResolveMany(type, injectableAttribute, serviceKey, instanceOrigins, dependencyInjector ?? this))
                 yield return item;
         }
 
-        public bool TryResolve<T>(out T obj, InjectableAttributeBase injectableAttribute = null, object serviceKey = null, IDependencyInjector dependencyInjector = null)
+        public bool TryResolve<T>(out T obj, InjectableAttributeBase injectableAttribute = null, object serviceKey = null, InstanceOrigins instanceOrigins = InstanceOrigins.All, IDependencyInjector dependencyInjector = null)
         {
             if (CheckType(typeof(T)))
             {
@@ -242,10 +255,10 @@ namespace Diese.Injection
                 return true;
             }
 
-            return Injector.TryResolve(out obj, injectableAttribute, serviceKey, dependencyInjector ?? this);
+            return Injector.TryResolve(out obj, injectableAttribute, serviceKey, instanceOrigins, dependencyInjector ?? this);
         }
 
-        public bool TryResolve(out object obj, Type type, InjectableAttributeBase injectableAttribute = null, object serviceKey = null, IDependencyInjector dependencyInjector = null)
+        public bool TryResolve(out object obj, Type type, InjectableAttributeBase injectableAttribute = null, object serviceKey = null, InstanceOrigins instanceOrigins = InstanceOrigins.All, IDependencyInjector dependencyInjector = null)
         {
             if (CheckType(type))
             {
@@ -253,10 +266,10 @@ namespace Diese.Injection
                 return true;
             }
 
-            return Injector.TryResolve(out obj, type, injectableAttribute, serviceKey, dependencyInjector ?? this);
+            return Injector.TryResolve(out obj, type, injectableAttribute, serviceKey, instanceOrigins, dependencyInjector ?? this);
         }
 
-        public bool TryResolveMany<T>(out IEnumerable<T> objs, InjectableAttributeBase injectableAttribute = null, object serviceKey = null, IDependencyInjector dependencyInjector = null)
+        public bool TryResolveMany<T>(out IEnumerable<T> objs, InjectableAttributeBase injectableAttribute = null, object serviceKey = null, InstanceOrigins instanceOrigins = InstanceOrigins.All, IDependencyInjector dependencyInjector = null)
         {
             if (CheckType(typeof(T)))
             {
@@ -264,10 +277,10 @@ namespace Diese.Injection
                 return true;
             }
 
-            return Injector.TryResolveMany(out objs, injectableAttribute, serviceKey, dependencyInjector ?? this);
+            return Injector.TryResolveMany(out objs, injectableAttribute, serviceKey, instanceOrigins, dependencyInjector ?? this);
         }
 
-        public bool TryResolveMany(out IEnumerable objs, Type type, InjectableAttributeBase injectableAttribute = null, object serviceKey = null, IDependencyInjector dependencyInjector = null)
+        public bool TryResolveMany(out IEnumerable objs, Type type, InjectableAttributeBase injectableAttribute = null, object serviceKey = null, InstanceOrigins instanceOrigins = InstanceOrigins.All, IDependencyInjector dependencyInjector = null)
         {
             if (CheckType(type))
             {
@@ -275,7 +288,7 @@ namespace Diese.Injection
                 return true;
             }
 
-            return Injector.TryResolveMany(out objs, type, injectableAttribute, serviceKey, dependencyInjector ?? this);
+            return Injector.TryResolveMany(out objs, type, injectableAttribute, serviceKey, instanceOrigins, dependencyInjector ?? this);
         }
     }
 }

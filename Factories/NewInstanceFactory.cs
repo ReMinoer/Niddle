@@ -9,15 +9,16 @@ using Diese.Injection.Factories.Data;
 
 namespace Diese.Injection.Factories
 {
-    internal class TransientFactory : DependencyFactoryBase
+    internal class NewInstanceFactory : DependencyFactoryBase
     {
         static private readonly Stack<IDependencyFactory> FactoryStack = new Stack<IDependencyFactory>();
         private readonly ConstructorData _constructorData;
         private readonly PropertyData[] _propertiesData;
         private readonly FieldData[] _fieldsData;
         private bool _alreadyInvoke;
+        public override InstanceOrigin InstanceOrigin => InstanceOrigin.Instantiation;
 
-        public TransientFactory(Type type, object serviceKey, ConstructorInfo constructorInfo, Substitution substitution)
+        public NewInstanceFactory(Type type, object serviceKey, ConstructorInfo constructorInfo, Substitution substitution)
             : base(type, serviceKey, substitution)
         {
             _constructorData = new ConstructorData(constructorInfo);
