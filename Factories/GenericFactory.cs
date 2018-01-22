@@ -9,7 +9,7 @@ namespace Diese.Injection.Factories
     {
         private readonly Dictionary<Type, IDependencyFactory> _dependencyFactories;
         private readonly int _constructorIndex;
-        public override InstanceOrigin InstanceOrigin { get; }
+        public override InstanceOrigin? InstanceOrigin { get; }
         public ConstructorInfo Constructor { get; }
 
         public GenericFactory(Type genericTypeDescription, InstanceOrigin instanceOrigin, object serviceKey, ConstructorInfo constructor, Substitution substitution)
@@ -41,10 +41,10 @@ namespace Diese.Injection.Factories
             IDependencyFactory factory;
             switch (InstanceOrigin)
             {
-                case InstanceOrigin.Instantiation:
+                case Injection.InstanceOrigin.Instantiation:
                     factory = new NewInstanceFactory(derivedType, null, derivedConstructor, Substitution.Forbidden);
                     break;
-                case InstanceOrigin.Registration:
+                case Injection.InstanceOrigin.Registration:
                     factory = new SingletonFactory(derivedType, null, derivedConstructor, Substitution.Forbidden);
                     break;
                 default:

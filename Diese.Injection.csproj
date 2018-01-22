@@ -50,10 +50,14 @@
     <Compile Include="Factories\LazyFactory.cs" />
     <Compile Include="Factories\GenericFactory.cs" />
     <Compile Include="IGenericFactory.cs" />
+    <Compile Include="IInjectableAttribute.cs" />
+    <Compile Include="IInjectableManyAttribute.cs" />
     <Compile Include="InjectableAttribute.cs" />
     <Compile Include="IInjectionService.cs" />
-    <Compile Include="InjectableAttributeBase.cs" />
+    <Compile Include="Base\InjectableAttributeBase.cs" />
     <Compile Include="InjectableCollectionAttribute.cs" />
+    <Compile Include="Base\DependencyInjectorBase.cs" />
+    <Compile Include="Base\InjectableManyAttributeBase.cs" />
     <Compile Include="RegistryInjector.cs" />
     <Compile Include="Exceptions\CyclicDependencyException.cs" />
     <Compile Include="Factories\Data\ParameterData.cs" />

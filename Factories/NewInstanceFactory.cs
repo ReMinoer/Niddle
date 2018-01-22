@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Diese.Injection.Base;
 using Diese.Injection.Exceptions;
 using Diese.Injection.Factories.Base;
 using Diese.Injection.Factories.Data;
@@ -16,7 +17,7 @@ namespace Diese.Injection.Factories
         private readonly PropertyData[] _propertiesData;
         private readonly FieldData[] _fieldsData;
         private bool _alreadyInvoke;
-        public override InstanceOrigin InstanceOrigin => InstanceOrigin.Instantiation;
+        public override InstanceOrigin? InstanceOrigin => Injection.InstanceOrigin.Instantiation;
 
         public NewInstanceFactory(Type type, object serviceKey, ConstructorInfo constructorInfo, Substitution substitution)
             : base(type, serviceKey, substitution)

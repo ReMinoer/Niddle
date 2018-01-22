@@ -7,7 +7,7 @@ namespace Diese.Injection.Factories
         public Type Type { get; }
         public object ServiceKey { get; }
         public Substitution Substitution { get; }
-        public abstract InstanceOrigin InstanceOrigin { get; }
+        public abstract InstanceOrigin? InstanceOrigin { get; }
 
         protected FactoryBase(Type type, object serviceKey, Substitution substitution)
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Diese.Injection.Base;
 
 namespace Diese.Injection.Factories.Data
 {

@@ -129,12 +129,12 @@ namespace Diese.Injection
         public void Link(Type linkedType, Type registeredType, object registeredKey = null, object serviceKey = null,
             Substitution substitution = Substitution.Forbidden)
         {
-            AddDependencyFactory(new LinkedFactory(linkedType, this[registeredType, registeredKey], serviceKey, substitution));
+            AddDependencyFactory(new LinkedFactory(this, linkedType, registeredType, registeredKey, serviceKey, substitution));
         }
 
         public void LinkGeneric(Type linkedTypeDescription, Type registeredTypeDescription, object registeredKey = null, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
         {
-            AddGenericFactory(new LinkedGenericFactory(linkedTypeDescription, _genericFactories[registeredTypeDescription, registeredKey], serviceKey, substitution));
+            AddGenericFactory(new LinkedGenericFactory(_genericFactories, linkedTypeDescription, registeredTypeDescription, registeredKey, serviceKey, substitution));
         }
 
         private void AddDependencyFactory(IDependencyFactory factory)
@@ -179,6 +179,10 @@ namespace Diese.Injection
                             throw new NotSupportedException();
                     }
                 }
+            }
+
+            public TFactory this[InstanceOrigin? instanceOrigin]
+            {
                 set
                 {
                     switch (instanceOrigin)
@@ -187,6 +191,10 @@ namespace Diese.Injection
                             _instantiationFactory = value;
                             break;
                         case InstanceOrigin.Registration:
+                            _registrationFactory = value;
+                            break;
+                        case null:
+                            _instantiationFactory = value;
                             _registrationFactory = value;
                             break;
                         default:
@@ -199,17 +207,24 @@ namespace Diese.Injection
             {
                 get
                 {
-                    if ((instanceOrigins & InstanceOrigins.Registration) != 0 && _registrationFactory != null)
-                        return _registrationFactory;
+                    if ((instanceOrigins & InstanceOrigins.Registration) != 0)
+                    {
+                        if (_registrationFactory != null)
+                            return _registrationFactory;
+                    }
+
                     if ((instanceOrigins & InstanceOrigins.Instantiation) != 0)
-                        return _instantiationFactory;
+                    {
+                        if (_instantiationFactory != null)
+                            return _instantiationFactory;
+                    }
 
                     return null;
                 }
             }
         }
 
-        private sealed class KeyableServiceRegistry<TFactory>
+        internal sealed class KeyableServiceRegistry<TFactory>
             where TFactory : class, IInjectionService
         {
             private readonly Dictionary<Type, OriginFactories<TFactory>> _defaultFactories;
@@ -249,19 +264,23 @@ namespace Diese.Injection
 
                 if (type == null)
                     throw new ArgumentException("Registered type is null !");
-                
-                if (_defaultFactories.TryGetValue(type, out OriginFactories<TFactory> factoryBySubsistence))
+
+                if (_defaultFactories.TryGetValue(type, out OriginFactories<TFactory> originFactories))
                 {
-                    if (factoryBySubsistence[factory.InstanceOrigin].Substitution == Substitution.Forbidden)
-                        throw new AlreadyRegisterException(type);
+                    if (factory.InstanceOrigin != null)
+                    {
+                        TFactory originFactory = originFactories[factory.InstanceOrigin.Value];
+                        if (originFactory.InstanceOrigin != null && originFactory.Substitution == Substitution.Forbidden)
+                            throw new AlreadyRegisterException(type);
+                    }
                 }
                 else
                 {
-                    factoryBySubsistence = new OriginFactories<TFactory>();
-                    _defaultFactories[type] = factoryBySubsistence;
+                    originFactories = new OriginFactories<TFactory>();
+                    _defaultFactories[type] = originFactories;
                 }
 
-                factoryBySubsistence[factory.InstanceOrigin] = factory;
+                originFactories[factory.InstanceOrigin] = factory;
             }
 
             public void AddToKeyedFactories(TFactory factory)
@@ -274,8 +293,12 @@ namespace Diese.Injection
                 {
                     if (factoryDictionary.TryGetValue(type, out originFactories))
                     {
-                        if (originFactories[factory.InstanceOrigin].Substitution == Substitution.Forbidden)
-                            throw new AlreadyRegisterException(serviceKey);
+                        if (factory.InstanceOrigin != null)
+                        {
+                            TFactory originFactory = originFactories[factory.InstanceOrigin.Value];
+                            if (originFactory.InstanceOrigin != null && originFactory.Substitution == Substitution.Forbidden)
+                                throw new AlreadyRegisterException(serviceKey);
+                        }
                     }
                     else
                     {

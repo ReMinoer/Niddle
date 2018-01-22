@@ -5,18 +5,22 @@ namespace Diese.Injection.Factories
 {
     internal class LinkedGenericFactory : GenericFactoryBase
     {
-        private readonly IGenericFactory _factory;
-        public override InstanceOrigin InstanceOrigin => _factory.InstanceOrigin;
+        private readonly DependencyRegistry.KeyableServiceRegistry<IGenericFactory> _genericFactories;
+        private readonly Type _registeredTypeDescription;
+        private readonly object _registeredKey;
+        public override InstanceOrigin? InstanceOrigin => null;
 
-        public LinkedGenericFactory(Type type, IGenericFactory factory, object serviceKey, Substitution substitution)
-            : base(type, serviceKey, substitution)
+        public LinkedGenericFactory(DependencyRegistry.KeyableServiceRegistry<IGenericFactory> genericFactories, Type linkedTypeDescription, Type registeredTypeDescription, object registeredKey, object serviceKey, Substitution substitution)
+            : base(linkedTypeDescription, serviceKey, substitution)
         {
-            _factory = factory;
+            _genericFactories = genericFactories;
+            _registeredTypeDescription = registeredTypeDescription;
+            _registeredKey = registeredKey;
         }
 
         public override IDependencyFactory GetFactory(Type[] genericTypeArguments)
         {
-            return _factory.GetFactory(genericTypeArguments);
+            return _genericFactories[_registeredTypeDescription, _registeredKey].GetFactory(genericTypeArguments);
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Diese.Injection.Factories
     internal class SingletonFactory : NewInstanceFactory
     {
         private object _instance;
-        public override InstanceOrigin InstanceOrigin => InstanceOrigin.Registration;
+        public override InstanceOrigin? InstanceOrigin => Injection.InstanceOrigin.Registration;
 
         public SingletonFactory(Type type, object serviceKey, ConstructorInfo constructorInfo, Substitution substitution)
             : base(type, serviceKey, constructorInfo, substitution)
