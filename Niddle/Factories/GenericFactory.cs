@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Niddle.Factories.Base;
+using Niddle.Utils;
 
 namespace Niddle.Factories
 {
@@ -19,14 +21,7 @@ namespace Niddle.Factories
             Constructor = constructor;
 
             _dependencyFactories = new Dictionary<Type, IDependencyFactory>();
-
-            ConstructorInfo[] allConstructors = Type.GetConstructors();
-            for (int i = 0; i < allConstructors.Length; i++)
-                if (allConstructors[i] == constructor)
-                {
-                    _constructorIndex = i;
-                    break;
-                }
+            _constructorIndex = Type.GetTypeInfo().DeclaredConstructors.IndexOf(constructor);
         }
 
         public override IDependencyFactory GetFactory(Type[] genericTypeArguments)
@@ -36,7 +31,7 @@ namespace Niddle.Factories
             if (_dependencyFactories.ContainsKey(derivedType))
                 return _dependencyFactories[derivedType];
 
-            ConstructorInfo derivedConstructor = derivedType.GetConstructors()[_constructorIndex];
+            ConstructorInfo derivedConstructor = derivedType.GetTypeInfo().DeclaredConstructors.ElementAt(_constructorIndex);
 
             IDependencyFactory factory;
             switch (InstanceOrigin)

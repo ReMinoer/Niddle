@@ -24,16 +24,19 @@ namespace Niddle.Factories
         {
             _constructorData = new ConstructorData(constructorInfo);
 
-            PropertyInfo[] propertyInfos = type.GetProperties()
-                .Where(x => (x.SetMethod != null && x.SetMethod.IsPublic || x.GetMethod != null && x.GetMethod.IsPublic) && x.CustomAttributes.Any(y => typeof(InjectableAttributeBase).IsAssignableFrom(y.AttributeType)))
+            TypeInfo typeInfo = type.GetTypeInfo();
+            TypeInfo attributeTypeInfo = typeof(InjectableAttributeBase).GetTypeInfo();
+
+            PropertyInfo[] propertyInfos = typeInfo.DeclaredProperties
+                .Where(x => (x.SetMethod != null && x.SetMethod.IsPublic || x.GetMethod != null && x.GetMethod.IsPublic) && x.CustomAttributes.Any(y => attributeTypeInfo.IsAssignableFrom(y.AttributeType.GetTypeInfo())))
                 .ToArray();
 
             _propertiesData = new PropertyData[propertyInfos.Length];
             for (int i = 0; i < _propertiesData.Length; i++)
                 _propertiesData[i] = new PropertyData(propertyInfos[i]);
 
-            FieldInfo[] fieldInfos = type.GetFields()
-                .Where(x => x.IsPublic && x.CustomAttributes.Any(y => typeof(InjectableAttributeBase).IsAssignableFrom(y.AttributeType)))
+            FieldInfo[] fieldInfos = typeInfo.DeclaredFields
+                .Where(x => x.IsPublic && x.CustomAttributes.Any(y => attributeTypeInfo.IsAssignableFrom(y.AttributeType.GetTypeInfo())))
                 .ToArray();
 
             _fieldsData = new FieldData[fieldInfos.Length];

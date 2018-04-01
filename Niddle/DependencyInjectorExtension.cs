@@ -106,7 +106,7 @@ namespace Niddle
 
         static private ConstructorInfo GetDefaultConstructor(Type type)
         {
-            return type.GetConstructors().Aggregate((min, next) => next.GetParameters().Length < min.GetParameters().Length ? next : min);
+            return type.GetTypeInfo().DeclaredConstructors.Aggregate((min, next) => next.GetParameters().Length < min.GetParameters().Length ? next : min);
         }
     }
 
@@ -143,7 +143,7 @@ namespace Niddle
 
         protected override bool CheckType(Type type)
         {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == Factory.Type;
+            return type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == Factory.Type;
         }
 
         protected override object ResolveExtension(Type type, IDependencyInjector dependencyInjector)
@@ -193,7 +193,7 @@ namespace Niddle
 
         protected override bool CheckType(Type type)
         {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == LinkedTypeDescription;
+            return type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == LinkedTypeDescription;
         }
 
         protected override object ResolveExtension(Type type, IDependencyInjector dependencyInjector)

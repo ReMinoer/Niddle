@@ -33,7 +33,7 @@ namespace Niddle
         {
             factory = _dependencyFactories[type, serviceKey, instanceOrigins];
 
-            if (factory == null && type.IsGenericType)
+            if (factory == null && type.GetTypeInfo().IsGenericType)
             {
                 IGenericFactory genericFactory = _genericFactories[type.GetGenericTypeDefinition(), serviceKey, instanceOrigins];
                 if (genericFactory != null)
@@ -155,7 +155,7 @@ namespace Niddle
 
         static private ConstructorInfo GetDefaultConstructor(Type type)
         {
-            return type.GetConstructors()
+            return type.GetTypeInfo().DeclaredConstructors
                 .Aggregate((min, next) => next.GetParameters().Length < min.GetParameters().Length ? next : min);
         }
 

@@ -16,20 +16,20 @@ namespace Niddle
         public override sealed void Inject(PropertyInfo propertyInfo, object obj, object value)
         {
             Type propertyType = propertyInfo.PropertyType;
-            Type trackerType = TypePredicate(propertyType) ? propertyType : propertyType.GetInterfaces().First(TypePredicate);
-            trackerType.GetMethod("Add").Invoke(propertyInfo.GetValue(obj), new[] { value });
+            Type trackerType = TypePredicate(propertyType) ? propertyType : propertyType.GetTypeInfo().ImplementedInterfaces.First(TypePredicate);
+            trackerType.GetTypeInfo().GetDeclaredMethod("Add").Invoke(propertyInfo.GetValue(obj), new[] { value });
         }
 
         public override sealed void Inject(FieldInfo fieldInfo, object obj, object value)
         {
             Type fieldType = fieldInfo.FieldType;
-            Type trackerType = TypePredicate(fieldType) ? fieldType : fieldType.GetInterfaces().First(TypePredicate);
-            trackerType.GetMethod("Add").Invoke(fieldInfo.GetValue(obj), new[] { value });
+            Type trackerType = TypePredicate(fieldType) ? fieldType : fieldType.GetTypeInfo().ImplementedInterfaces.First(TypePredicate);
+            trackerType.GetTypeInfo().GetDeclaredMethod("Add").Invoke(fieldInfo.GetValue(obj), new[] { value });
         }
 
         static private bool TypePredicate(Type type)
         {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ICollection<>);
+            return type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(ICollection<>);
         }
     }
 }
