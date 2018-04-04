@@ -23,11 +23,10 @@ namespace Niddle.Factories
             : base(type, serviceKey, substitution)
         {
             _constructorData = new ConstructorData(constructorInfo);
-
-            TypeInfo typeInfo = type.GetTypeInfo();
+            
             TypeInfo attributeTypeInfo = typeof(InjectableAttributeBase).GetTypeInfo();
 
-            PropertyInfo[] propertyInfos = typeInfo.DeclaredProperties
+            PropertyInfo[] propertyInfos = type.GetRuntimeProperties()
                 .Where(x => (x.SetMethod != null && x.SetMethod.IsPublic || x.GetMethod != null && x.GetMethod.IsPublic) && x.CustomAttributes.Any(y => attributeTypeInfo.IsAssignableFrom(y.AttributeType.GetTypeInfo())))
                 .ToArray();
 
@@ -35,7 +34,7 @@ namespace Niddle.Factories
             for (int i = 0; i < _propertiesData.Length; i++)
                 _propertiesData[i] = new PropertyData(propertyInfos[i]);
 
-            FieldInfo[] fieldInfos = typeInfo.DeclaredFields
+            FieldInfo[] fieldInfos = type.GetRuntimeFields()
                 .Where(x => x.IsPublic && x.CustomAttributes.Any(y => attributeTypeInfo.IsAssignableFrom(y.AttributeType.GetTypeInfo())))
                 .ToArray();
 

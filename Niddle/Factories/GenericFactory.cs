@@ -21,7 +21,7 @@ namespace Niddle.Factories
             Constructor = constructor;
 
             _dependencyFactories = new Dictionary<Type, IDependencyFactory>();
-            _constructorIndex = Type.GetTypeInfo().DeclaredConstructors.IndexOf(constructor);
+            _constructorIndex = Type.GetTypeInfo().DeclaredConstructors.Where(x => x.IsPublic).IndexOf(constructor);
         }
 
         public override IDependencyFactory GetFactory(Type[] genericTypeArguments)
@@ -31,7 +31,7 @@ namespace Niddle.Factories
             if (_dependencyFactories.ContainsKey(derivedType))
                 return _dependencyFactories[derivedType];
 
-            ConstructorInfo derivedConstructor = derivedType.GetTypeInfo().DeclaredConstructors.ElementAt(_constructorIndex);
+            ConstructorInfo derivedConstructor = derivedType.GetTypeInfo().DeclaredConstructors.Where(x => x.IsPublic).ElementAt(_constructorIndex);
 
             IDependencyFactory factory;
             switch (InstanceOrigin)

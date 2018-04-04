@@ -106,7 +106,7 @@ namespace Niddle
 
         static private ConstructorInfo GetDefaultConstructor(Type type)
         {
-            return type.GetTypeInfo().DeclaredConstructors.Aggregate((min, next) => next.GetParameters().Length < min.GetParameters().Length ? next : min);
+            return type.GetTypeInfo().DeclaredConstructors.Where(x => x.IsPublic).Aggregate((min, next) => next.GetParameters().Length < min.GetParameters().Length ? next : min);
         }
     }
 
