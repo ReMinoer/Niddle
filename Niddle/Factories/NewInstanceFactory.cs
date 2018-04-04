@@ -7,6 +7,7 @@ using Niddle.Base;
 using Niddle.Exceptions;
 using Niddle.Factories.Base;
 using Niddle.Factories.Data;
+using Niddle.Utils;
 
 namespace Niddle.Factories
 {
@@ -71,8 +72,14 @@ namespace Niddle.Factories
             {
                 if (field.InjectableAttribute is IInjectableManyAttribute manyAttribute)
                 {
-                    injector.TryResolveMany(out IEnumerable values, manyAttribute.GetInjectedType(field.Type), field.InjectableAttribute, field.ServiceKey);
-                    manyAttribute.Inject(field.FieldInfo, instance, values);
+                    foreach (object value in manyAttribute.GetInjectableTypes(field.Type).SelectMany(x =>
+                    {
+                        injector.TryResolveMany(out IEnumerable values, x, field.InjectableAttribute, field.ServiceKey);
+                        return values.Cast<object>();
+                    }))
+                    {
+                        manyAttribute.Inject(field.FieldInfo, instance, value);
+                    }
                 }
                 else
                 {
@@ -85,8 +92,14 @@ namespace Niddle.Factories
             {
                 if (property.InjectableAttribute is IInjectableManyAttribute manyAttribute)
                 {
-                    injector.TryResolveMany(out IEnumerable values, manyAttribute.GetInjectedType(property.Type), property.InjectableAttribute, property.ServiceKey);
-                    manyAttribute.Inject(property.PropertyInfo, instance, values);
+                    foreach (object value in manyAttribute.GetInjectableTypes(property.Type).SelectMany(x =>
+                    {
+                        injector.TryResolveMany(out IEnumerable values, x, property.InjectableAttribute, property.ServiceKey);
+                        return values.Cast<object>();
+                    }))
+                    {
+                        manyAttribute.Inject(property.PropertyInfo, instance, value);
+                    }
                 }
                 else
                 {
