@@ -7,11 +7,10 @@ using Niddle.Base;
 using Niddle.Exceptions;
 using Niddle.Factories.Base;
 using Niddle.Factories.Data;
-using Niddle.Utils;
 
 namespace Niddle.Factories
 {
-    internal class NewInstanceFactory : DependencyFactoryBase
+    public class NewInstanceFactory : DependencyFactoryBase
     {
         static private readonly Stack<IDependencyFactory> FactoryStack = new Stack<IDependencyFactory>();
         private readonly ConstructorData _constructorData;
@@ -20,10 +19,10 @@ namespace Niddle.Factories
         private bool _alreadyInvoke;
         public override InstanceOrigin? InstanceOrigin => Niddle.InstanceOrigin.Instantiation;
 
-        public NewInstanceFactory(Type type, object serviceKey, ConstructorInfo constructorInfo, Substitution substitution)
+        public NewInstanceFactory(Type type, object serviceKey, ConstructorData constructorData, Substitution substitution)
             : base(type, serviceKey, substitution)
         {
-            _constructorData = new ConstructorData(constructorInfo);
+            _constructorData = constructorData;
             
             TypeInfo attributeTypeInfo = typeof(InjectableAttributeBase).GetTypeInfo();
 
@@ -52,7 +51,7 @@ namespace Niddle.Factories
             FactoryStack.Push(this);
             _alreadyInvoke = true;
 
-            var parameters = new object[_constructorData.Count];
+            var parameters = new object[_constructorData.ParametersData.Length];
             for (int i = 0; i < parameters.Length; i++)
             {
                 ParameterData data = _constructorData.ParametersData[i];
@@ -66,7 +65,7 @@ namespace Niddle.Factories
                     parameters[i] = injector.Resolve(data.Type, data.InjectableAttribute, data.ServiceKey);
             }
 
-            object instance = _constructorData.ConstructorInfo.Invoke(parameters);
+            object instance = _constructorData.Delegate.DynamicInvoke(parameters);
 
             foreach (FieldData field in _fieldsData)
             {

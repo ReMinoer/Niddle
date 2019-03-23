@@ -21,7 +21,7 @@ namespace Niddle.Test
         [Test]
         public void RegisterType()
         {
-            _registry.Register<Player>();
+            _registry.Add(Dependency.OnType<Player>());
 
             var player = _injector.Resolve<Player>();
             var otherPlayer = _injector.Resolve<Player>();
@@ -33,7 +33,7 @@ namespace Niddle.Test
         [Test]
         public void RegisterImplementationA()
         {
-            _registry.Register<ICharacter, Player>();
+            _registry.Add(Dependency.OnType<ICharacter>().Creating<Player>());
 
             var character = _injector.Resolve<ICharacter>();
 
@@ -43,7 +43,7 @@ namespace Niddle.Test
         [Test]
         public void RegisterImplementationB()
         {
-            _registry.Register(typeof(ICharacter), typeof(Player));
+            _registry.Add(Dependency.OnType<ICharacter>().Creating<Player>());
 
             object character = _injector.Resolve(typeof(ICharacter));
 
@@ -54,7 +54,7 @@ namespace Niddle.Test
         public void RegisterInstance()
         {
             var alpha = new Character();
-            _registry.RegisterInstance<ICharacter>(alpha);
+            _registry.Add(Dependency.OnType<ICharacter>().Using(alpha));
 
             var resolvedAlpha = _injector.Resolve<ICharacter>();
 
@@ -62,21 +62,9 @@ namespace Niddle.Test
         }
 
         [Test]
-        public void RegisterLazy()
-        {
-            _registry.RegisterLazy<ICharacter>(() => new Character());
-            var lazy = _injector.Resolve<Lazy<ICharacter>>();
-
-            Assert.IsFalse(lazy.IsValueCreated);
-
-            Assert.IsNotNull(lazy.Value);
-            Assert.IsTrue(lazy.IsValueCreated);
-        }
-
-        [Test]
         public void RegisterSingleton()
         {
-            _registry.RegisterSingleton<Game>();
+            _registry.Add(Dependency.OnType<Game>().AsSingleton());
 
             var game = _injector.Resolve<Game>();
             var otherGame = _injector.Resolve<Game>();
@@ -87,16 +75,16 @@ namespace Niddle.Test
         [Test]
         public void RegisterAction()
         {
-            _registry.Register<Level>();
-            _registry.Register<ICharacter, Character>();
-            _registry.Register<IPlayer, Player>();
-            _registry.RegisterSingleton<Game>();
+            _registry.Add(Dependency.OnType<Level>());
+            _registry.Add(Dependency.OnType<ICharacter>().Creating<Character>());
+            _registry.Add(Dependency.OnType<IPlayer>().Creating<Player>());
+            _registry.Add(Dependency.OnType<Game>());
 
             var level = _injector.Resolve<Level>();
 
             Assert.IsNotNull(level.CharacterA);
 
-            _registry.RegisterAction<Level>(x => x.CharacterA = null);
+            _registry.Add(Dependency.OnType<Action<Level>>().Using(x => x.CharacterA = null));
             var action = _injector.Resolve<Action<Level>>();
 
             action(level);
@@ -107,7 +95,7 @@ namespace Niddle.Test
         [Test]
         public void RegisterFunc()
         {
-            _registry.RegisterFunc<int, int>(x => x * 2);
+            _registry.Add(Dependency.OnType<Func<int, int>>().Using(x => x * 2));
 
             var func = _injector.Resolve<Func<int, int>>();
             int result = func(10);
@@ -118,7 +106,7 @@ namespace Niddle.Test
         [Test]
         public void RegisterGeneric()
         {
-            _registry.RegisterGeneric(typeof(List<>));
+            _registry.Add(Dependency.OnGeneric(typeof(List<>)));
 
             var list = _injector.Resolve<List<int>>();
             var list2 = _injector.Resolve<List<string>>();
@@ -132,8 +120,8 @@ namespace Niddle.Test
         [Test]
         public void RegisterKeyed()
         {
-            _registry.RegisterSingleton<IPlayer, Player>(PlayerId.One);
-            _registry.RegisterSingleton<IPlayer, Player>(PlayerId.Two);
+            _registry.Add(Dependency.OnType<IPlayer>().Creating<Player>().AsSingleton().Keyed(PlayerId.One));
+            _registry.Add(Dependency.OnType<IPlayer>().Creating<Player>().AsSingleton().Keyed(PlayerId.Two));
 
             var playerOne = _injector.Resolve<IPlayer>(serviceKey: PlayerId.One);
             var otherPlayerOne = _injector.Resolve<IPlayer>(serviceKey: PlayerId.One);
@@ -152,9 +140,9 @@ namespace Niddle.Test
         [Test]
         public void LinkTypes()
         {
-            _registry.RegisterSingleton<IPlayer, Player>(PlayerId.One);
-            _registry.RegisterSingleton<IPlayer, Player>(PlayerId.Two);
-            _registry.Link<IPlayer, IPlayer>(PlayerId.One, "MainPlayer");
+            _registry.Add(Dependency.OnType<IPlayer>().Creating<Player>().AsSingleton().Keyed(PlayerId.One));
+            _registry.Add(Dependency.OnType<IPlayer>().Creating<Player>().AsSingleton().Keyed(PlayerId.Two));
+            _registry.Add(Dependency.OnType<IPlayer>().Keyed("MainPlayer").LinkedTo<IPlayer>().Keyed(PlayerId.One));
 
             var playerOne = _injector.Resolve<IPlayer>(serviceKey: PlayerId.One);
             var playerTwo = _injector.Resolve<IPlayer>(serviceKey: PlayerId.Two);
@@ -167,9 +155,9 @@ namespace Niddle.Test
         [Test]
         public void RegisterWithDependencies()
         {
-            _registry.Register<ILevel, Level>();
-            _registry.Register<IPlayer, Player>();
-            _registry.RegisterSingleton<Game>();
+            _registry.Add(Dependency.OnType<ILevel>().Creating<Level>());
+            _registry.Add(Dependency.OnType<IPlayer>().Creating<Player>());
+            _registry.Add(Dependency.OnType<Game>().AsSingleton());
 
             var level = _injector.Resolve<ILevel>();
 
@@ -181,9 +169,9 @@ namespace Niddle.Test
         [Test]
         public void InjectPropertyAndField()
         {
-            _registry.Register<Level>();
-            _registry.Register<IPlayer, Player>();
-            _registry.RegisterSingleton<Game>();
+            _registry.Add(Dependency.OnType<Level>());
+            _registry.Add(Dependency.OnType<IPlayer>().Creating<Player>());
+            _registry.Add(Dependency.OnType<Game>().AsSingleton());
 
             var level = _injector.Resolve<Level>();
 
@@ -192,8 +180,8 @@ namespace Niddle.Test
             Assert.IsNotNull(level.Player);
             Assert.IsNull(level.CharacterA);
             Assert.IsNull(level.CharacterB);
-
-            _registry.Register<ICharacter, Character>();
+            
+            _registry.Add(Dependency.OnType<ICharacter>().Creating<Character>());
 
             var otherLevel = _injector.Resolve<Level>();
 

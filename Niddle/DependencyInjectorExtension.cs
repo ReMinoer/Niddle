@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Niddle.Base;
 using Niddle.Factories;
+using Niddle.Factories.Data;
 
 namespace Niddle
 {
@@ -22,7 +23,7 @@ namespace Niddle
 
         static public IDependencyInjector With(this IDependencyInjector injector, Type type, ConstructorInfo constructor = null)
         {
-            return new DepedencyInjectorFactoryExtension(injector, new NewInstanceFactory(type, null, constructor ?? GetDefaultConstructor(type), Substitution.Forbidden));
+            return new DepedencyInjectorFactoryExtension(injector, new NewInstanceFactory(type, null, new ConstructorData(constructor ?? GetDefaultConstructor(type)), Substitution.Forbidden));
         }
         
         static public IDependencyInjector WithSingleton<TAbstract, TImplementation>(this IDependencyInjector injector, ConstructorInfo constructor = null)
@@ -37,7 +38,7 @@ namespace Niddle
 
         static public IDependencyInjector WithSingleton(this IDependencyInjector injector, Type type, ConstructorInfo constructor = null)
         {
-            return new DepedencyInjectorFactoryExtension(injector, new SingletonFactory(type, null, constructor ?? GetDefaultConstructor(type), Substitution.Forbidden));
+            return new DepedencyInjectorFactoryExtension(injector, new SingletonFactory(type, null, new ConstructorData(constructor ?? GetDefaultConstructor(type)), Substitution.Forbidden));
         }
 
         static public IDependencyInjector WithGeneric(this IDependencyInjector injector, Type genericTypeDescription, ConstructorInfo constructor = null)
@@ -45,7 +46,7 @@ namespace Niddle
 
         static public IDependencyInjector WithGeneric(this IDependencyInjector injector, Type abstractTypeDescription, Type genericTypeDescription, ConstructorInfo constructor = null)
         {
-            return new DepedencyInjectorGenericExtension(injector, new GenericFactory(abstractTypeDescription, InstanceOrigin.Instantiation, null,
+            return new DepedencyInjectorGenericExtension(injector, new GenericFactory(abstractTypeDescription, genericTypeDescription, InstanceOrigin.Instantiation, null,
                 constructor ?? GetDefaultConstructor(genericTypeDescription), Substitution.Forbidden));
         }
 
@@ -54,7 +55,7 @@ namespace Niddle
 
         static public IDependencyInjector WithGenericSingleton(this IDependencyInjector injector, Type abstractTypeDescription, Type genericTypeDescription, ConstructorInfo constructor = null)
         {
-            return new DepedencyInjectorGenericExtension(injector, new GenericFactory(abstractTypeDescription, InstanceOrigin.Registration, null,
+            return new DepedencyInjectorGenericExtension(injector, new GenericFactory(abstractTypeDescription, genericTypeDescription, InstanceOrigin.Registration, null,
                 constructor ?? GetDefaultConstructor(genericTypeDescription), Substitution.Forbidden));
         }
 

@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Niddle.Exceptions;
-using Niddle.Factories;
 
 namespace Niddle
 {
@@ -29,115 +29,35 @@ namespace Niddle
             }
         }
 
+        public IDependencyFactory this[Type genericTypeDefinition, IEnumerable<Type> genericTypeArguments, object serviceKey = null, InstanceOrigins instanceOrigins = InstanceOrigins.All]
+        {
+            get
+            {
+                if (TryGetFactory(out IDependencyFactory factory, genericTypeDefinition, genericTypeArguments, serviceKey, instanceOrigins))
+                    return factory;
+
+                throw new NotRegisterException(genericTypeDefinition, serviceKey);
+            }
+        }
+
         public bool TryGetFactory(out IDependencyFactory factory, Type type, object serviceKey = null, InstanceOrigins instanceOrigins = InstanceOrigins.All)
         {
             factory = _dependencyFactories[type, serviceKey, instanceOrigins];
+            if (factory != null)
+                return true;
 
-            if (factory == null && type.GetTypeInfo().IsGenericType)
-            {
-                IGenericFactory genericFactory = _genericFactories[type.GetGenericTypeDefinition(), serviceKey, instanceOrigins];
-                if (genericFactory != null)
-                    factory = genericFactory.GetFactory(type.GenericTypeArguments);
-            }
+            return type.GetTypeInfo().IsGenericType && TryGetFactory(out factory, type.GetGenericTypeDefinition(), type.GenericTypeArguments, serviceKey, instanceOrigins);
+        }
+
+        public bool TryGetFactory(out IDependencyFactory factory, Type genericTypeDefinition, IEnumerable<Type> genericTypeArguments, object serviceKey = null, InstanceOrigins instanceOrigins = InstanceOrigins.All)
+        {
+            IGenericFactory genericFactory = _genericFactories[genericTypeDefinition, serviceKey, instanceOrigins];
+            factory = genericFactory?.GetFactory(genericTypeArguments);
 
             return factory != null;
         }
 
-        public void Register<TAbstract, TImplementation>(object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
-            where TImplementation : TAbstract
-            => Register(typeof(TAbstract), typeof(TImplementation), serviceKey, constructor, substitution);
-
-        public void Register(Type abstractType, Type implementationType, object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
-            => Register(abstractType, serviceKey, constructor ?? GetDefaultConstructor(implementationType), substitution);
-
-        public void Register<T>(object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
-            => Register(typeof(T), serviceKey, constructor, substitution);
-
-        public void Register(Type type, object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
-        {
-            AddDependencyFactory(new NewInstanceFactory(type, serviceKey, constructor ?? GetDefaultConstructor(type), substitution));
-        }
-
-        public void RegisterSingleton<TAbstract, TImplementation>(object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
-            where TImplementation : TAbstract
-            => RegisterSingleton(typeof(TAbstract), typeof(TImplementation), serviceKey, constructor, substitution);
-
-        public void RegisterSingleton(Type abstractType, Type implementationType, object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
-            => RegisterSingleton(abstractType, serviceKey, constructor ?? GetDefaultConstructor(implementationType), substitution);
-
-        public void RegisterSingleton<T>(object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
-            => RegisterSingleton(typeof(T), serviceKey, constructor, substitution);
-
-        public void RegisterSingleton(Type type, object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
-        {
-            AddDependencyFactory(new SingletonFactory(type, serviceKey, constructor ?? GetDefaultConstructor(type), substitution));
-        }
-
-        public void RegisterGeneric(Type genericTypeDescription, object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
-            => RegisterGeneric(genericTypeDescription, genericTypeDescription, serviceKey, constructor, substitution);
-
-        public void RegisterGeneric(Type abstractTypeDescription, Type genericTypeDescription, object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
-        {
-            AddGenericFactory(new GenericFactory(abstractTypeDescription, InstanceOrigin.Instantiation, serviceKey, constructor ?? GetDefaultConstructor(genericTypeDescription), substitution));
-        }
-
-        public void RegisterGenericSingleton(Type genericTypeDescription, object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
-            => RegisterGenericSingleton(genericTypeDescription, genericTypeDescription, serviceKey, constructor, substitution);
-
-        public void RegisterGenericSingleton(Type abstractTypeDescription, Type genericTypeDescription, object serviceKey = null, ConstructorInfo constructor = null, Substitution substitution = Substitution.Forbidden)
-        {
-            AddGenericFactory(new GenericFactory(abstractTypeDescription, InstanceOrigin.Registration, serviceKey, constructor ?? GetDefaultConstructor(genericTypeDescription), substitution));
-        }
-
-        public void RegisterInstance<TAbstract>(TAbstract instance, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
-        {
-            RegisterInstance(typeof(TAbstract), instance, serviceKey, substitution);
-        }
-
-        public void RegisterInstance(Type abstractType, object instance, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
-        {
-            AddDependencyFactory(new InstanceFactory(abstractType, instance, serviceKey, substitution));
-        }
-
-        public void RegisterLazy<T>(Func<T> factory, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
-        {
-            AddDependencyFactory(new LazyFactory<T>(factory, serviceKey, substitution));
-        }
-
-        public void RegisterAction<TIn>(Action<TIn> action, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
-        {
-            AddDependencyFactory(new ActionFactory<TIn>(action, serviceKey, substitution));
-        }
-
-        public void RegisterFunc<TOut>(Func<TOut> func, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
-        {
-            AddDependencyFactory(new FuncFactory<TOut>(func, serviceKey, substitution));
-        }
-
-        public void RegisterFunc<TIn, TOut>(Func<TIn, TOut> func, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
-        {
-            AddDependencyFactory(new FuncFactory<TIn, TOut>(func, serviceKey, substitution));
-        }
-
-        public void Link<TLinked, TRegistered>(object registeredKey = null, object serviceKey = null,
-            Substitution substitution = Substitution.Forbidden)
-            where TRegistered : TLinked
-        {
-            Link(typeof(TLinked), typeof(TRegistered), registeredKey, serviceKey, substitution);
-        }
-
-        public void Link(Type linkedType, Type registeredType, object registeredKey = null, object serviceKey = null,
-            Substitution substitution = Substitution.Forbidden)
-        {
-            AddDependencyFactory(new LinkedFactory(this, linkedType, registeredType, registeredKey, serviceKey, substitution));
-        }
-
-        public void LinkGeneric(Type linkedTypeDescription, Type registeredTypeDescription, object registeredKey = null, object serviceKey = null, Substitution substitution = Substitution.Forbidden)
-        {
-            AddGenericFactory(new LinkedGenericFactory(_genericFactories, linkedTypeDescription, registeredTypeDescription, registeredKey, serviceKey, substitution));
-        }
-
-        private void AddDependencyFactory(IDependencyFactory factory)
+        public void Add(IDependencyFactory factory)
         {
             if (factory.ServiceKey != null)
                 _dependencyFactories.AddToKeyedFactories(factory);
@@ -145,7 +65,7 @@ namespace Niddle
                 _dependencyFactories.AddToDefaultFactories(factory);
         }
 
-        private void AddGenericFactory(IGenericFactory genericFactory)
+        public void Add(IGenericFactory genericFactory)
         {
             if (genericFactory.ServiceKey != null)
                 _genericFactories.AddToKeyedFactories(genericFactory);
@@ -153,12 +73,14 @@ namespace Niddle
                 _genericFactories.AddToDefaultFactories(genericFactory);
         }
 
-        static private ConstructorInfo GetDefaultConstructor(Type type)
+        public IEnumerator<IInjectionService> GetEnumerator()
         {
-            return type.GetTypeInfo().DeclaredConstructors.Where(x => x.IsPublic).Aggregate((min, next) => next.GetParameters().Length < min.GetParameters().Length ? next : min);
+            return Enumerable.Concat<IInjectionService>(_dependencyFactories, _genericFactories).GetEnumerator();
         }
 
-        private class OriginFactories<TFactory>
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        private class OriginFactories<TFactory> : IEnumerable<TFactory>
             where TFactory : class, IInjectionService
         {
             private TFactory _instantiationFactory;
@@ -221,9 +143,24 @@ namespace Niddle
                     return null;
                 }
             }
+
+            public IEnumerator<TFactory> GetEnumerator()
+            {
+                return Enumerate().GetEnumerator();
+
+                IEnumerable<TFactory> Enumerate()
+                {
+                    if (_registrationFactory != null)
+                        yield return _registrationFactory;
+                    if (_instantiationFactory != null)
+                        yield return _instantiationFactory;
+                }
+            }
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-        internal sealed class KeyableServiceRegistry<TFactory>
+        internal sealed class KeyableServiceRegistry<TFactory> : IEnumerable<TFactory>
             where TFactory : class, IInjectionService
         {
             private readonly Dictionary<Type, OriginFactories<TFactory>> _defaultFactories;
@@ -316,6 +253,13 @@ namespace Niddle
 
                 originFactories[factory.InstanceOrigin] = factory;
             }
+
+            public IEnumerator<TFactory> GetEnumerator()
+            {
+                return Enumerable.Concat(_defaultFactories.Values.SelectMany(x => x), _keyedFactories.Values.SelectMany(x => x.Values.SelectMany(y => y))).GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
     }
 }

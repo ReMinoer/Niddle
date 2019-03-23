@@ -3,7 +3,7 @@ using Niddle.Factories.Base;
 
 namespace Niddle.Factories
 {
-    internal class InstanceFactory : DependencyFactoryBase
+    public class InstanceFactory : DependencyFactoryBase
     {
         private readonly object _instance;
         public override InstanceOrigin? InstanceOrigin => Niddle.InstanceOrigin.Registration;

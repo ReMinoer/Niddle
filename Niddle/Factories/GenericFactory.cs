@@ -3,44 +3,46 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Niddle.Factories.Base;
+using Niddle.Factories.Data;
 using Niddle.Utils;
 
 namespace Niddle.Factories
 {
-    internal class GenericFactory : GenericFactoryBase
+    public class GenericFactory : GenericFactoryBase
     {
+        private readonly Type _genericTypeDefinition;
         private readonly Dictionary<Type, IDependencyFactory> _dependencyFactories;
         private readonly int _constructorIndex;
         public override InstanceOrigin? InstanceOrigin { get; }
-        public ConstructorInfo Constructor { get; }
 
-        public GenericFactory(Type genericTypeDescription, InstanceOrigin instanceOrigin, object serviceKey, ConstructorInfo constructor, Substitution substitution)
-            : base(genericTypeDescription, serviceKey, substitution)
+        public GenericFactory(Type abstractTypeDefinition, Type genericTypeDefinition, InstanceOrigin instanceOrigin, object serviceKey, ConstructorInfo constructor, Substitution substitution)
+            : base(abstractTypeDefinition, serviceKey, substitution)
         {
+            _genericTypeDefinition = genericTypeDefinition?? abstractTypeDefinition;
             InstanceOrigin = instanceOrigin;
-            Constructor = constructor;
 
             _dependencyFactories = new Dictionary<Type, IDependencyFactory>();
-            _constructorIndex = Type.GetTypeInfo().DeclaredConstructors.Where(x => x.IsPublic).IndexOf(constructor);
+            _constructorIndex = _genericTypeDefinition.GetTypeInfo().DeclaredConstructors.Where(x => x.IsPublic).IndexOf(constructor);
         }
 
-        public override IDependencyFactory GetFactory(Type[] genericTypeArguments)
+        public override IDependencyFactory GetFactory(IEnumerable<Type> genericTypeArguments)
         {
-            Type derivedType = Type.MakeGenericType(genericTypeArguments);
+            Type derivedType = _genericTypeDefinition.MakeGenericType(genericTypeArguments as Type[] ?? genericTypeArguments.ToArray());
 
             if (_dependencyFactories.ContainsKey(derivedType))
                 return _dependencyFactories[derivedType];
 
             ConstructorInfo derivedConstructor = derivedType.GetTypeInfo().DeclaredConstructors.Where(x => x.IsPublic).ElementAt(_constructorIndex);
+            var derivedConstructorData = new ConstructorData(derivedConstructor);
 
             IDependencyFactory factory;
             switch (InstanceOrigin)
             {
                 case Niddle.InstanceOrigin.Instantiation:
-                    factory = new NewInstanceFactory(derivedType, null, derivedConstructor, Substitution.Forbidden);
+                    factory = new NewInstanceFactory(derivedType, null, derivedConstructorData, Substitution.Forbidden);
                     break;
                 case Niddle.InstanceOrigin.Registration:
-                    factory = new SingletonFactory(derivedType, null, derivedConstructor, Substitution.Forbidden);
+                    factory = new SingletonFactory(derivedType, null, derivedConstructorData, Substitution.Forbidden);
                     break;
                 default:
                     throw new ArgumentException();

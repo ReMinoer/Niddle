@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Niddle.Exceptions
 {
@@ -8,7 +9,7 @@ namespace Niddle.Exceptions
         private const string KeyMessage = "Type \"{0}\" keyed \"{1}\" is not registered !";
 
         public NotRegisterException(Type type, object key)
-            : base(key == null ? string.Format(TypeMessage, type.Name) : string.Format(KeyMessage, type, key))
+            : base($"Type \"{type.Name}\"{(key != null ? $" keyed \"{key}\"" : "")} is not registered !")
         {
         }
 

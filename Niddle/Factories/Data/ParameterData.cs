@@ -5,7 +5,7 @@ using Niddle.Base;
 
 namespace Niddle.Factories.Data
 {
-    internal class ParameterData
+    public class ParameterData
     {
         public Type Type { get; private set; }
         public object ServiceKey { get; private set; }

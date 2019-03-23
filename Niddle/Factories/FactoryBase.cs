@@ -2,7 +2,7 @@
 
 namespace Niddle.Factories
 {
-    internal abstract class FactoryBase : IInjectionService
+    public abstract class FactoryBase : IInjectionService
     {
         public Type Type { get; }
         public object ServiceKey { get; }

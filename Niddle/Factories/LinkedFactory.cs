@@ -5,12 +5,12 @@ namespace Niddle.Factories
 {
     internal class LinkedFactory : DependencyFactoryBase
     {
-        private readonly DependencyRegistry _dependencyRegistry;
+        private readonly IDependencyRegistry _dependencyRegistry;
         private readonly Type _registeredType;
         private readonly object _registeredKey;
         public override InstanceOrigin? InstanceOrigin => null;
 
-        public LinkedFactory(DependencyRegistry dependencyRegistry, Type linkedType, Type registeredType, object registeredKey, object serviceKey, Substitution substitution)
+        public LinkedFactory(IDependencyRegistry dependencyRegistry, Type linkedType, Type registeredType, object registeredKey, object serviceKey, Substitution substitution)
             : base(linkedType, serviceKey, substitution)
         {
             _dependencyRegistry = dependencyRegistry;

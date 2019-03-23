@@ -2,7 +2,7 @@
 
 namespace Niddle.Factories.Base
 {
-    internal abstract class DependencyFactoryBase : FactoryBase, IDependencyFactory
+    public abstract class DependencyFactoryBase : FactoryBase, IDependencyFactory
     {
         protected DependencyFactoryBase(Type type, object serviceKey, Substitution substitution)
             : base(type, serviceKey, substitution)
