@@ -16,12 +16,9 @@ namespace Niddle.Factories.Data
         public ParameterData(ParameterInfo parameterInfo)
         {
             Type = parameterInfo.ParameterType;
-
-            Attribute[] attributes = parameterInfo.GetCustomAttributes(typeof(ServiceKeyAttribute)).ToArray();
-            if (attributes.Length > 0)
-                ServiceKey = ((ServiceKeyAttribute)attributes.First()).Key;
-
+            
             InjectableAttribute = parameterInfo.GetCustomAttribute<InjectableAttributeBase>();
+            ServiceKey = InjectableAttribute?.Key;
 
             HasDefaultValue = parameterInfo.HasDefaultValue;
             if (HasDefaultValue)

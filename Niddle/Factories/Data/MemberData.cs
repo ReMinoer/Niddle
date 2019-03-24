@@ -13,9 +13,9 @@ namespace Niddle.Factories.Data
         public MemberData(Type type, MemberInfo memberInfo)
         {
             Type = type;
-
-            ServiceKey = memberInfo.GetCustomAttribute<ServiceKeyAttribute>()?.Key;
+            
             InjectableAttribute = memberInfo.GetCustomAttribute<InjectableAttributeBase>();
+            ServiceKey = InjectableAttribute?.Key;
         }
     }
 }
