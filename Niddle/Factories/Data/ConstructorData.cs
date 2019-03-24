@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -7,23 +8,31 @@ namespace Niddle.Factories.Data
 {
     public class ConstructorData
     {
-        public Delegate Delegate { get; }
+        public Func<object[], object> Delegate { get; }
         public ParameterData[] ParametersData { get; private set; }
 
         public ConstructorData(ConstructorInfo constructorInfo)
         {
-            NewExpression newExpression = Expression.New(constructorInfo, constructorInfo.GetParameters().Select(x => Expression.Parameter(x.ParameterType, x.Name)));
-            Delegate = Expression.Lambda(newExpression, newExpression.Arguments.Cast<ParameterExpression>()).Compile();
-            
+            Delegate = BuildLambda(constructorInfo, arguments => Expression.New(constructorInfo, arguments));
             ParametersData = GetParametersData(constructorInfo);
         }
 
         public ConstructorData(MethodInfo methodInfo)
         {
-            MethodCallExpression methodCallExpression = Expression.Call(methodInfo);
-            Delegate = Expression.Lambda(methodCallExpression, methodCallExpression.Arguments.Cast<ParameterExpression>()).Compile();
-
+            Delegate = BuildLambda(methodInfo, arguments => Expression.Call(methodInfo, arguments));
             ParametersData = GetParametersData(methodInfo);
+        }
+
+        static private Func<object[], object> BuildLambda(MethodBase methodBase, Func<IEnumerable<Expression>, Expression> bodyBuilder)
+        {
+            Type[] types = methodBase.GetParameters().Select(x => x.ParameterType).ToArray();
+            
+            ParameterExpression array = Expression.Parameter(typeof(object[]));
+            IEnumerable<Expression> parametersFromArray = types.Select((t, i) => Expression.Convert(Expression.ArrayAccess(array, Expression.Constant(i, typeof(int))), t));
+
+            Expression body = Expression.Convert(bodyBuilder(parametersFromArray), typeof(object));
+
+            return (Func<object[], object>)Expression.Lambda(body, array).Compile();
         }
 
         static public ParameterData[] GetParametersData(MethodBase methodBase)

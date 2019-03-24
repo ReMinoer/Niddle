@@ -65,7 +65,7 @@ namespace Niddle.Factories
                     parameters[i] = injector.Resolve(data.Type, data.InjectableAttribute, data.ServiceKey);
             }
 
-            object instance = _constructorData.Delegate.DynamicInvoke(parameters);
+            object instance = _constructorData.Delegate(parameters);
 
             foreach (FieldData field in _fieldsData)
             {
