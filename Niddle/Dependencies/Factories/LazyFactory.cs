@@ -1,7 +1,7 @@
 ﻿using System;
-using Niddle.Factories.Base;
+using Niddle.Dependencies.Factories.Base;
 
-namespace Niddle.Factories
+namespace Niddle.Dependencies.Factories
 {
     internal class LazyFactory<T> : DependencyFactoryBase
     {
@@ -14,7 +14,7 @@ namespace Niddle.Factories
             _lazy = new Lazy<T>(factory);
         }
 
-        public override object Get(IDependencyInjector injector)
+        public override object Get(IDependencyResolver resolver)
         {
             return _lazy;
         }

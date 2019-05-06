@@ -11,15 +11,15 @@
             DefaultValue = defaultValue;
         }
 
-        public object Resolve(IDependencyInjector injector)
+        public object Resolve(IDependencyResolver resolver)
         {
-            TryResolve(injector, out object parameterValue);
+            TryResolve(resolver, out object parameterValue);
             return parameterValue;
         }
 
-        public bool TryResolve(IDependencyInjector injector, out object value)
+        public bool TryResolve(IDependencyResolver resolver, out object value)
         {
-            value = Resolvable.TryResolve(injector, out object parameterValue) ? parameterValue : DefaultValue;
+            value = Resolvable.TryResolve(resolver, out object parameterValue) ? parameterValue : DefaultValue;
             return true;
         }
     }

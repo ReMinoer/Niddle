@@ -2,10 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Niddle.Dependencies.Factories.Base;
 using Niddle.Exceptions;
-using Niddle.Factories.Base;
 
-namespace Niddle.Factories
+namespace Niddle.Dependencies.Factories
 {
     public class NewInstanceFactory : DependencyFactoryBase
     {
@@ -22,7 +22,7 @@ namespace Niddle.Factories
             _resolvableMembers = ResolvableMembersProvider.Get<object>(type).ToArray();
         }
 
-        public override object Get(IDependencyInjector injector)
+        public override object Get(IDependencyResolver resolver)
         {
             if (_alreadyInvoke)
                 throw new CyclicDependencyException(FactoryStack);
@@ -30,10 +30,10 @@ namespace Niddle.Factories
             FactoryStack.Push(this);
             _alreadyInvoke = true;
 
-            object instance = _resolvableInstantiator.ResolveAndReject(injector, null);
+            object instance = _resolvableInstantiator.ResolveAndReject(resolver, null);
 
             foreach (IResolvableInjectable<object, object> resolvableMember in _resolvableMembers)
-                resolvableMember.TryResolveAndInject(injector, instance);
+                resolvableMember.TryResolveAndInject(resolver, instance);
 
             _alreadyInvoke = false;
             FactoryStack.Pop();

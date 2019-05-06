@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Niddle.Factories.Base;
+using Niddle.Dependencies.Factories.Base;
 
-namespace Niddle.Factories
+namespace Niddle.Dependencies.Factories
 {
     internal class LinkedGenericFactory : GenericFactoryBase
     {

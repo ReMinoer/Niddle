@@ -12,10 +12,10 @@ namespace Niddle.Hybrids
         }
 
         public TReject Reject(TTarget target, TValue value) => Injectable.Reject(target, value);
-        public TReject ResolveAndReject(IDependencyInjector injector, TTarget target) => Reject(target, Resolve(injector));
-        public IOptional<TReject> TryResolveAndReject(IDependencyInjector injector, TTarget target)
+        public TReject ResolveAndReject(IDependencyResolver resolver, TTarget target) => Reject(target, Resolve(resolver));
+        public IOptional<TReject> TryResolveAndReject(IDependencyResolver resolver, TTarget target)
         {
-            return TryResolve(injector, out TValue value)
+            return TryResolve(resolver, out TValue value)
                 ? Reject(target, value)
                 : Optional<TReject>.NoValue;
         }

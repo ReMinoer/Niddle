@@ -4,27 +4,27 @@ namespace Niddle.Resolvables
 {
     public class Resolvable : SingleResolvableBase, IResolvable<object>
     {
-        public override object Resolve(IDependencyInjector injector)
+        public override object Resolve(IDependencyResolver resolver)
         {
-            return injector.Resolve(Type, Key, InstanceOrigins, injector, AdditionalArguments);
+            return resolver.Resolve(Type, Key, InstanceOrigins, resolver, AdditionalArguments);
         }
 
-        public override bool TryResolve(IDependencyInjector injector, out object value)
+        public override bool TryResolve(IDependencyResolver resolver, out object value)
         {
-            return injector.TryResolve(out value, Type, Key, InstanceOrigins, injector, AdditionalArguments);
+            return resolver.TryResolve(out value, Type, Key, InstanceOrigins, resolver, AdditionalArguments);
         }
     }
 
     public class Resolvable<TValue> : SingleResolvableBase<TValue>
     {
-        public override TValue Resolve(IDependencyInjector injector)
+        public override TValue Resolve(IDependencyResolver resolver)
         {
-            return injector.Resolve<TValue>(Key, InstanceOrigins, injector, AdditionalArguments);
+            return resolver.Resolve<TValue>(Key, InstanceOrigins, resolver, AdditionalArguments);
         }
 
-        public override bool TryResolve(IDependencyInjector injector, out TValue value)
+        public override bool TryResolve(IDependencyResolver resolver, out TValue value)
         {
-            return injector.TryResolve(out value, Key, InstanceOrigins, injector, AdditionalArguments);
+            return resolver.TryResolve(out value, Key, InstanceOrigins, resolver, AdditionalArguments);
         }
     }
 }

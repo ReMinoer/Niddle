@@ -2,10 +2,10 @@
 
 namespace Niddle
 {
-    public interface IInjectionService
+    public interface IFactory
     {
         Type Type { get; }
-        object ServiceKey { get; }
+        object Key { get; }
         Substitution Substitution { get; }
         InstanceOrigin? InstanceOrigin { get; }
     }

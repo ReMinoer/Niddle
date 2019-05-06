@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Niddle.Builders
+namespace Niddle.Dependencies.Builders
 {
     public interface IDependencyBuilder<out TFactory>
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Niddle.Factories.Base
+namespace Niddle.Dependencies.Factories.Base
 {
     public abstract class DependencyFactoryBase : FactoryBase, IDependencyFactory
     {
@@ -9,6 +9,6 @@ namespace Niddle.Factories.Base
         {
         }
 
-        public abstract object Get(IDependencyInjector injector);
+        public abstract object Get(IDependencyResolver resolver);
     }
 }

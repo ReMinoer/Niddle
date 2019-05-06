@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 
-namespace Niddle.Factories
+namespace Niddle.Dependencies.Factories
 {
     public class SingletonFactory : NewInstanceFactory
     {
@@ -13,12 +13,12 @@ namespace Niddle.Factories
         {
         }
 
-        public override object Get(IDependencyInjector injector)
+        public override object Get(IDependencyResolver resolver)
         {
             if (_instance != null)
                 return _instance;
 
-            _instance = base.Get(injector);
+            _instance = base.Get(resolver);
 
             return _instance;
         }

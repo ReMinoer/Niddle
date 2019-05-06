@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 
-namespace Niddle.Builders.Helpers
+namespace Niddle.Dependencies.Builders.Helpers
 {
     static public class ReflectionHelper
     {

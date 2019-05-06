@@ -8,14 +8,14 @@ namespace Niddle.Test
     [TestFixture]
     public class InjectionTest
     {
-        private IDependencyInjector _injector;
+        private IDependencyResolver _resolver;
         private IDependencyRegistry _registry;
 
         [SetUp]
         public void SetUp()
         {
             _registry = new DependencyRegistry();
-            _injector = new RegistryInjector(_registry);
+            _resolver = new RegistryResolver(_registry);
         }
 
         [Test]
@@ -23,8 +23,8 @@ namespace Niddle.Test
         {
             _registry.Add(Dependency.OnType<Player>());
 
-            var player = _injector.Resolve<Player>();
-            var otherPlayer = _injector.Resolve<Player>();
+            var player = _resolver.Resolve<Player>();
+            var otherPlayer = _resolver.Resolve<Player>();
 
             Assert.IsNotNull(player);
             Assert.AreNotEqual(player, otherPlayer);
@@ -35,7 +35,7 @@ namespace Niddle.Test
         {
             _registry.Add(Dependency.OnType<ICharacter>().Creating<Player>());
 
-            var character = _injector.Resolve<ICharacter>();
+            var character = _resolver.Resolve<ICharacter>();
 
             Assert.IsTrue(character is Player);
         }
@@ -45,7 +45,7 @@ namespace Niddle.Test
         {
             _registry.Add(Dependency.OnType<ICharacter>().Creating<Player>());
 
-            object character = _injector.Resolve(typeof(ICharacter));
+            object character = _resolver.Resolve(typeof(ICharacter));
 
             Assert.IsTrue(character is Player);
         }
@@ -56,7 +56,7 @@ namespace Niddle.Test
             var alpha = new Character();
             _registry.Add(Dependency.OnType<ICharacter>().Using(alpha));
 
-            var resolvedAlpha = _injector.Resolve<ICharacter>();
+            var resolvedAlpha = _resolver.Resolve<ICharacter>();
 
             Assert.AreEqual(alpha, resolvedAlpha);
         }
@@ -66,8 +66,8 @@ namespace Niddle.Test
         {
             _registry.Add(Dependency.OnType<Game>().AsSingleton());
 
-            var game = _injector.Resolve<Game>();
-            var otherGame = _injector.Resolve<Game>();
+            var game = _resolver.Resolve<Game>();
+            var otherGame = _resolver.Resolve<Game>();
 
             Assert.AreEqual(game, otherGame);
         }
@@ -80,12 +80,12 @@ namespace Niddle.Test
             _registry.Add(Dependency.OnType<IPlayer>().Creating<Player>());
             _registry.Add(Dependency.OnType<Game>());
 
-            var level = _injector.Resolve<Level>();
+            var level = _resolver.Resolve<Level>();
 
             Assert.IsNotNull(level.CharacterA);
 
             _registry.Add(Dependency.OnType<Action<Level>>().Using(x => x.CharacterA = null));
-            var action = _injector.Resolve<Action<Level>>();
+            var action = _resolver.Resolve<Action<Level>>();
 
             action(level);
 
@@ -97,7 +97,7 @@ namespace Niddle.Test
         {
             _registry.Add(Dependency.OnType<Func<int, int>>().Using(x => x * 2));
 
-            var func = _injector.Resolve<Func<int, int>>();
+            var func = _resolver.Resolve<Func<int, int>>();
             int result = func(10);
 
             Assert.AreEqual(result, 20);
@@ -108,9 +108,9 @@ namespace Niddle.Test
         {
             _registry.Add(Dependency.OnGeneric(typeof(List<>)));
 
-            var list = _injector.Resolve<List<int>>();
-            var list2 = _injector.Resolve<List<string>>();
-            var list3 = _injector.Resolve<List<Player>>();
+            var list = _resolver.Resolve<List<int>>();
+            var list2 = _resolver.Resolve<List<string>>();
+            var list3 = _resolver.Resolve<List<Player>>();
 
             Assert.IsNotNull(list);
             Assert.IsNotNull(list2);
@@ -123,10 +123,10 @@ namespace Niddle.Test
             _registry.Add(Dependency.OnType<IPlayer>().Creating<Player>().AsSingleton().Keyed(PlayerId.One));
             _registry.Add(Dependency.OnType<IPlayer>().Creating<Player>().AsSingleton().Keyed(PlayerId.Two));
 
-            var playerOne = _injector.Resolve<IPlayer>(key: PlayerId.One);
-            var otherPlayerOne = _injector.Resolve<IPlayer>(key: PlayerId.One);
-            var playerTwo = _injector.Resolve<IPlayer>(key: PlayerId.Two);
-            var otherPlayerTwo = _injector.Resolve<IPlayer>(key: PlayerId.Two);
+            var playerOne = _resolver.Resolve<IPlayer>(key: PlayerId.One);
+            var otherPlayerOne = _resolver.Resolve<IPlayer>(key: PlayerId.One);
+            var playerTwo = _resolver.Resolve<IPlayer>(key: PlayerId.Two);
+            var otherPlayerTwo = _resolver.Resolve<IPlayer>(key: PlayerId.Two);
 
             Assert.AreEqual(playerOne, otherPlayerOne);
             Assert.AreEqual(playerTwo, otherPlayerTwo);
@@ -144,9 +144,9 @@ namespace Niddle.Test
             _registry.Add(Dependency.OnType<IPlayer>().Creating<Player>().AsSingleton().Keyed(PlayerId.Two));
             _registry.Add(Dependency.OnType<IPlayer>().Keyed("MainPlayer").LinkedTo<IPlayer>().Keyed(PlayerId.One));
 
-            var playerOne = _injector.Resolve<IPlayer>(key: PlayerId.One);
-            var playerTwo = _injector.Resolve<IPlayer>(key: PlayerId.Two);
-            var mainPlayer = _injector.Resolve<IPlayer>(key: "MainPlayer");
+            var playerOne = _resolver.Resolve<IPlayer>(key: PlayerId.One);
+            var playerTwo = _resolver.Resolve<IPlayer>(key: PlayerId.Two);
+            var mainPlayer = _resolver.Resolve<IPlayer>(key: "MainPlayer");
 
             Assert.AreEqual(playerOne, mainPlayer);
             Assert.AreNotEqual(playerTwo, mainPlayer);
@@ -159,7 +159,7 @@ namespace Niddle.Test
             _registry.Add(Dependency.OnType<IPlayer>().Creating<Player>());
             _registry.Add(Dependency.OnType<Game>().AsSingleton());
 
-            var level = _injector.Resolve<ILevel>();
+            var level = _resolver.Resolve<ILevel>();
 
             Assert.IsNotNull(level);
             Assert.IsNotNull(level.Game);
@@ -173,7 +173,7 @@ namespace Niddle.Test
             _registry.Add(Dependency.OnType<IPlayer>().Creating<Player>());
             _registry.Add(Dependency.OnType<Game>().AsSingleton());
 
-            var level = _injector.Resolve<Level>();
+            var level = _resolver.Resolve<Level>();
 
             Assert.IsNotNull(level);
             Assert.IsNotNull(level.Game);
@@ -183,7 +183,7 @@ namespace Niddle.Test
             
             _registry.Add(Dependency.OnType<ICharacter>().Creating<Character>());
 
-            var otherLevel = _injector.Resolve<Level>();
+            var otherLevel = _resolver.Resolve<Level>();
 
             Assert.IsNotNull(otherLevel);
             Assert.IsNotNull(otherLevel.Game);

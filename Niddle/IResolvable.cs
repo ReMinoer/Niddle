@@ -2,13 +2,13 @@
 {
     public interface IResolvable
     {
-        object Resolve(IDependencyInjector injector);
-        bool TryResolve(IDependencyInjector injector, out object value);
+        object Resolve(IDependencyResolver resolver);
+        bool TryResolve(IDependencyResolver resolver, out object value);
     }
 
     public interface IResolvable<TValue> : IResolvable
     {
-        new TValue Resolve(IDependencyInjector injector);
-        bool TryResolve(IDependencyInjector injector, out TValue value);
+        new TValue Resolve(IDependencyResolver resolver);
+        bool TryResolve(IDependencyResolver resolver, out TValue value);
     }
 }

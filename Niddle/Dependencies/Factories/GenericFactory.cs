@@ -3,10 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Niddle.Factories.Base;
+using Niddle.Dependencies.Factories.Base;
 using Niddle.Utils;
 
-namespace Niddle.Factories
+namespace Niddle.Dependencies.Factories
 {
     public class GenericFactory : GenericFactoryBase
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Niddle
 {
-    public interface IGenericFactory : IInjectionService
+    public interface IGenericFactory : IFactory
     {
         IDependencyFactory GetFactory(IEnumerable<Type> genericTypeArguments);
     }

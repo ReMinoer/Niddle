@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Reflection;
-using Niddle.Builders.Base;
-using Niddle.Builders.Helpers;
-using Niddle.Factories;
+using Niddle.Dependencies.Builders.Base;
+using Niddle.Dependencies.Builders.Helpers;
+using Niddle.Dependencies.Factories;
 
-namespace Niddle.Builders
+namespace Niddle.Dependencies.Builders
 {
     public class GenericDependencyBuilder : DependencyBuilderBase<IGenericFactory, IGenericDependencyBuilder, ILinkGenericDependencyBuilder>, IGenericDependencyBuilder
     {

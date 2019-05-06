@@ -10,8 +10,8 @@ namespace Niddle.Resolvables.Base
         public InstanceOrigins InstanceOrigins { get; set; } = InstanceOrigins.All;
         public IEnumerable<object> AdditionalArguments { get; set; }
 
-        public abstract object Resolve(IDependencyInjector injector);
-        public abstract bool TryResolve(IDependencyInjector injector, out object value);
+        public abstract object Resolve(IDependencyResolver resolver);
+        public abstract bool TryResolve(IDependencyResolver resolver, out object value);
     }
 
     public abstract class SingleResolvableBase<TValue> : ResolvableBase<TValue>

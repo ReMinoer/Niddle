@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Reflection;
-using Niddle.Builders.Base;
-using Niddle.Builders.Helpers;
-using Niddle.Factories;
+using Niddle.Dependencies.Builders.Base;
+using Niddle.Dependencies.Builders.Helpers;
+using Niddle.Dependencies.Factories;
 
-namespace Niddle.Builders
+namespace Niddle.Dependencies.Builders
 {
     public class TypeDependencyBuilder<T> : DependencyBuilderBase<IDependencyFactory, ITypeDependencyBuilder<T>, ILinkTypeDependencyBuilder>, ITypeDependencyBuilder<T>
     {

@@ -14,17 +14,17 @@ namespace Niddle.Resolvables
             _resolvables = resolvables.ToArray();
         }
 
-        public override IEnumerable Resolve(IDependencyInjector injector)
+        public override IEnumerable Resolve(IDependencyResolver resolver)
         {
-            return _resolvables.Select(x => x.Resolve(injector));
+            return _resolvables.Select(x => x.Resolve(resolver));
         }
 
-        public override bool TryResolve(IDependencyInjector injector, out IEnumerable value)
+        public override bool TryResolve(IDependencyResolver resolver, out IEnumerable value)
         {
             var parameters = new List<object>(_resolvables.Count);
             foreach (IResolvable resolvable in _resolvables)
             {
-                if (resolvable.TryResolve(injector, out object parameterValue))
+                if (resolvable.TryResolve(resolver, out object parameterValue))
                 {
                     parameters.Add(parameterValue);
                 }

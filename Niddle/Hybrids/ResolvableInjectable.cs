@@ -11,13 +11,13 @@ namespace Niddle.Hybrids
         {
         }
 
-        new public TValue Resolve(IDependencyInjector injector) => Resolvable.Resolve(injector);
-        public bool TryResolve(IDependencyInjector injector, out TValue value) => Resolvable.TryResolve(injector, out value);
+        new public TValue Resolve(IDependencyResolver resolver) => Resolvable.Resolve(resolver);
+        public bool TryResolve(IDependencyResolver resolver, out TValue value) => Resolvable.TryResolve(resolver, out value);
         public void Inject(TTarget target, TValue value) => Injectable.Inject(target, value);
-        public void ResolveAndInject(IDependencyInjector injector, TTarget target) => Inject(target, Resolve(injector));
-        public bool TryResolveAndInject(IDependencyInjector injector, TTarget target)
+        public void ResolveAndInject(IDependencyResolver resolver, TTarget target) => Inject(target, Resolve(resolver));
+        public bool TryResolveAndInject(IDependencyResolver resolver, TTarget target)
         {
-            if (!TryResolve(injector, out TValue value))
+            if (!TryResolve(resolver, out TValue value))
                 return false;
 
             Inject(target, value);
@@ -40,7 +40,7 @@ namespace Niddle.Hybrids
             Injectable = injectable;
         }
 
-        public object Resolve(IDependencyInjector injector) => Resolvable.Resolve(injector);
-        public bool TryResolve(IDependencyInjector injector, out object value) => Resolvable.TryResolve(injector, out value);
+        public object Resolve(IDependencyResolver resolver) => Resolvable.Resolve(resolver);
+        public bool TryResolve(IDependencyResolver resolver, out object value) => Resolvable.TryResolve(resolver, out value);
     }
 }

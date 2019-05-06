@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Niddle.Builders.Base
+namespace Niddle.Dependencies.Builders.Base
 {
     public abstract class DependencyBuilderBase<TFactory, TBuilder, TLinkBuilder> : IDependencyBuilder<TFactory, TBuilder, TLinkBuilder>
         where TBuilder : IDependencyBuilder<TFactory, TBuilder, TLinkBuilder>

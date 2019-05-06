@@ -12,19 +12,19 @@ namespace Niddle.Resolvables
         public string PopulateMethodName { get; set; }
         public Type Type { get; set; }
 
-        public override IEnumerable Resolve(IDependencyInjector injector)
+        public override IEnumerable Resolve(IDependencyResolver resolver)
         {
             foreach (Type itemType in Type.GetPopulatableTypes(PopulateMethodName))
-                foreach (object item in injector.ResolveMany(itemType, Key, InstanceOrigins, injector, AdditionalArguments))
+                foreach (object item in resolver.ResolveMany(itemType, Key, InstanceOrigins, resolver, AdditionalArguments))
                     yield return item;
         }
 
-        public override bool TryResolve(IDependencyInjector injector, out IEnumerable value)
+        public override bool TryResolve(IDependencyResolver resolver, out IEnumerable value)
         {
             var valueList = new List<object>();
             foreach (Type itemType in Type.GetPopulatableTypes(PopulateMethodName))
             {
-                if (!injector.TryResolveMany(out IEnumerable resolvedValues, itemType, Key, InstanceOrigins, injector, AdditionalArguments))
+                if (!resolver.TryResolveMany(out IEnumerable resolvedValues, itemType, Key, InstanceOrigins, resolver, AdditionalArguments))
                     continue;
 
                 foreach (object item in resolvedValues)

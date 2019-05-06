@@ -1,7 +1,7 @@
 ﻿using System;
-using Niddle.Factories.Base;
+using Niddle.Dependencies.Factories.Base;
 
-namespace Niddle.Factories
+namespace Niddle.Dependencies.Factories
 {
     internal class ActionFactory<TIn> : DependencyFactoryBase
     {
@@ -14,7 +14,7 @@ namespace Niddle.Factories
             _action = action;
         }
 
-        public override object Get(IDependencyInjector injector)
+        public override object Get(IDependencyResolver resolver)
         {
             return _action;
         }

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Niddle.Builders;
+using Niddle.Dependencies.Builders;
 
 namespace Niddle
 {

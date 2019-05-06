@@ -1,7 +1,7 @@
 ﻿using System;
-using Niddle.Factories.Base;
+using Niddle.Dependencies.Factories.Base;
 
-namespace Niddle.Factories
+namespace Niddle.Dependencies.Factories
 {
     internal class LinkedFactory : DependencyFactoryBase
     {
@@ -18,9 +18,9 @@ namespace Niddle.Factories
             _registeredKey = registeredKey;
         }
 
-        public override object Get(IDependencyInjector injector)
+        public override object Get(IDependencyResolver resolver)
         {
-            return _dependencyRegistry[_registeredType, _registeredKey].Get(injector);
+            return _dependencyRegistry[_registeredType, _registeredKey].Get(resolver);
         }
     }
 }

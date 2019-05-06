@@ -59,7 +59,7 @@ namespace Niddle
 
         public void Add(IDependencyFactory factory)
         {
-            if (factory.ServiceKey != null)
+            if (factory.Key != null)
                 _dependencyFactories.AddToKeyedFactories(factory);
             else
                 _dependencyFactories.AddToDefaultFactories(factory);
@@ -67,21 +67,21 @@ namespace Niddle
 
         public void Add(IGenericFactory genericFactory)
         {
-            if (genericFactory.ServiceKey != null)
+            if (genericFactory.Key != null)
                 _genericFactories.AddToKeyedFactories(genericFactory);
             else
                 _genericFactories.AddToDefaultFactories(genericFactory);
         }
 
-        public IEnumerator<IInjectionService> GetEnumerator()
+        public IEnumerator<IFactory> GetEnumerator()
         {
-            return Enumerable.Concat<IInjectionService>(_dependencyFactories, _genericFactories).GetEnumerator();
+            return Enumerable.Concat<IFactory>(_dependencyFactories, _genericFactories).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         private class OriginFactories<TFactory> : IEnumerable<TFactory>
-            where TFactory : class, IInjectionService
+            where TFactory : class, IFactory
         {
             private TFactory _instantiationFactory;
             private TFactory _registrationFactory;
@@ -161,7 +161,7 @@ namespace Niddle
         }
 
         internal sealed class KeyableServiceRegistry<TFactory> : IEnumerable<TFactory>
-            where TFactory : class, IInjectionService
+            where TFactory : class, IFactory
         {
             private readonly Dictionary<Type, OriginFactories<TFactory>> _defaultFactories;
             private readonly Dictionary<object, Dictionary<Type, OriginFactories<TFactory>>> _keyedFactories;
@@ -222,7 +222,7 @@ namespace Niddle
             public void AddToKeyedFactories(TFactory factory)
             {
                 Type type = factory.Type;
-                object serviceKey = factory.ServiceKey;
+                object serviceKey = factory.Key;
 
                 OriginFactories<TFactory> originFactories;
                 if (_keyedFactories.TryGetValue(serviceKey, out Dictionary<Type, OriginFactories<TFactory>> factoryDictionary))

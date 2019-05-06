@@ -2,14 +2,14 @@
 {
     public abstract class ResolvableBase<TValue> : IResolvable<TValue>
     {
-        public abstract TValue Resolve(IDependencyInjector injector);
-        public abstract bool TryResolve(IDependencyInjector injector, out TValue value);
+        public abstract TValue Resolve(IDependencyResolver resolver);
+        public abstract bool TryResolve(IDependencyResolver resolver, out TValue value);
 
-        object IResolvable.Resolve(IDependencyInjector injector) => Resolve(injector);
+        object IResolvable.Resolve(IDependencyResolver resolver) => Resolve(resolver);
 
-        public bool TryResolve(IDependencyInjector injector, out object value)
+        public bool TryResolve(IDependencyResolver resolver, out object value)
         {
-            if (TryResolve(injector, out TValue obj))
+            if (TryResolve(resolver, out TValue obj))
             {
                 value = obj;
                 return true;

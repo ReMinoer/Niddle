@@ -10,7 +10,7 @@ namespace Niddle.Exceptions
 
         public CyclicDependencyException(IEnumerable<IDependencyFactory> factoryStack)
             : base(string.Format(CustomMessage,
-                string.Join(",", factoryStack.Select(x => x.ServiceKey != null ? "Key:" + x.ServiceKey : x.Type.Name))))
+                string.Join(",", factoryStack.Select(x => x.Key != null ? "Key:" + x.Key : x.Type.Name))))
         {
         }
     }

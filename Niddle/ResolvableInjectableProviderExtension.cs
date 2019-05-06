@@ -12,7 +12,7 @@ using Niddle.Resolvables;
 
 namespace Niddle
 {
-    static public class ReflectionInfoExtension
+    static public class ResolvableInjectableProviderExtension
     {
         // Attributes
 

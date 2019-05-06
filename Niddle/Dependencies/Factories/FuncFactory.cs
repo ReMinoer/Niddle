@@ -1,7 +1,7 @@
 ﻿using System;
-using Niddle.Factories.Base;
+using Niddle.Dependencies.Factories.Base;
 
-namespace Niddle.Factories
+namespace Niddle.Dependencies.Factories
 {
     internal class FuncFactory<TOut> : DependencyFactoryBase
     {
@@ -14,7 +14,7 @@ namespace Niddle.Factories
             _func = func;
         }
 
-        public override object Get(IDependencyInjector injector)
+        public override object Get(IDependencyResolver resolver)
         {
             return _func;
         }
@@ -31,7 +31,7 @@ namespace Niddle.Factories
             _func = func;
         }
 
-        public override object Get(IDependencyInjector injector)
+        public override object Get(IDependencyResolver resolver)
         {
             return _func;
         }

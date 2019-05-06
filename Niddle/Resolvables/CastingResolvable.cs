@@ -4,14 +4,14 @@
     {
         public IResolvable Resolvable { get; set; }
 
-        public TValue Resolve(IDependencyInjector injector)
+        public TValue Resolve(IDependencyResolver resolver)
         {
-            return (TValue)Resolvable.Resolve(injector);
+            return (TValue)Resolvable.Resolve(resolver);
         }
 
-        public bool TryResolve(IDependencyInjector injector, out TValue value)
+        public bool TryResolve(IDependencyResolver resolver, out TValue value)
         {
-            if (Resolvable.TryResolve(injector, out object obj))
+            if (Resolvable.TryResolve(resolver, out object obj))
             {
                 value = (TValue)obj;
                 return true;
@@ -21,7 +21,7 @@
             return false;
         }
 
-        object IResolvable.Resolve(IDependencyInjector injector) => Resolvable.Resolve(injector);
-        public bool TryResolve(IDependencyInjector injector, out object value) => Resolvable.TryResolve(injector, out value);
+        object IResolvable.Resolve(IDependencyResolver resolver) => Resolvable.Resolve(resolver);
+        public bool TryResolve(IDependencyResolver resolver, out object value) => Resolvable.TryResolve(resolver, out value);
     }
 }

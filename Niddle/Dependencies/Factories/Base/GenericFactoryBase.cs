@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Niddle.Factories.Base
+namespace Niddle.Dependencies.Factories.Base
 {
     public abstract class GenericFactoryBase : FactoryBase, IGenericFactory
     {
