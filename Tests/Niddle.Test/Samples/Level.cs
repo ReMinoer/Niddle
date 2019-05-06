@@ -1,5 +1,4 @@
 ﻿using Niddle.Attributes;
-using Niddle.Injectables;
 
 namespace Niddle.Test.Samples
 {
