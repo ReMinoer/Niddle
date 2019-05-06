@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Niddle.Factories.Base;
-using Niddle.Factories.Data;
 using Niddle.Utils;
 
 namespace Niddle.Factories
@@ -18,7 +18,7 @@ namespace Niddle.Factories
         public GenericFactory(Type abstractTypeDefinition, Type genericTypeDefinition, InstanceOrigin instanceOrigin, object serviceKey, ConstructorInfo constructor, Substitution substitution)
             : base(abstractTypeDefinition, serviceKey, substitution)
         {
-            _genericTypeDefinition = genericTypeDefinition?? abstractTypeDefinition;
+            _genericTypeDefinition = genericTypeDefinition ?? abstractTypeDefinition;
             InstanceOrigin = instanceOrigin;
 
             _dependencyFactories = new Dictionary<Type, IDependencyFactory>();
@@ -33,16 +33,16 @@ namespace Niddle.Factories
                 return _dependencyFactories[derivedType];
 
             ConstructorInfo derivedConstructor = derivedType.GetTypeInfo().DeclaredConstructors.Where(x => x.IsPublic).ElementAt(_constructorIndex);
-            var derivedConstructorData = new ConstructorData(derivedConstructor);
+            IResolvableRejecter<object, IEnumerable, object> resolvableDerivedConstructor = derivedConstructor.AsResolvableRejecter();
 
             IDependencyFactory factory;
             switch (InstanceOrigin)
             {
                 case Niddle.InstanceOrigin.Instantiation:
-                    factory = new NewInstanceFactory(derivedType, null, derivedConstructorData, Substitution.Forbidden);
+                    factory = new NewInstanceFactory(derivedType, null, resolvableDerivedConstructor, Substitution.Forbidden);
                     break;
                 case Niddle.InstanceOrigin.Registration:
-                    factory = new SingletonFactory(derivedType, null, derivedConstructorData, Substitution.Forbidden);
+                    factory = new SingletonFactory(derivedType, null, resolvableDerivedConstructor, Substitution.Forbidden);
                     break;
                 default:
                     throw new ArgumentException();

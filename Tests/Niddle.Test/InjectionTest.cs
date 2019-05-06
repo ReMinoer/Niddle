@@ -123,10 +123,10 @@ namespace Niddle.Test
             _registry.Add(Dependency.OnType<IPlayer>().Creating<Player>().AsSingleton().Keyed(PlayerId.One));
             _registry.Add(Dependency.OnType<IPlayer>().Creating<Player>().AsSingleton().Keyed(PlayerId.Two));
 
-            var playerOne = _injector.Resolve<IPlayer>(serviceKey: PlayerId.One);
-            var otherPlayerOne = _injector.Resolve<IPlayer>(serviceKey: PlayerId.One);
-            var playerTwo = _injector.Resolve<IPlayer>(serviceKey: PlayerId.Two);
-            var otherPlayerTwo = _injector.Resolve<IPlayer>(serviceKey: PlayerId.Two);
+            var playerOne = _injector.Resolve<IPlayer>(key: PlayerId.One);
+            var otherPlayerOne = _injector.Resolve<IPlayer>(key: PlayerId.One);
+            var playerTwo = _injector.Resolve<IPlayer>(key: PlayerId.Two);
+            var otherPlayerTwo = _injector.Resolve<IPlayer>(key: PlayerId.Two);
 
             Assert.AreEqual(playerOne, otherPlayerOne);
             Assert.AreEqual(playerTwo, otherPlayerTwo);
@@ -144,9 +144,9 @@ namespace Niddle.Test
             _registry.Add(Dependency.OnType<IPlayer>().Creating<Player>().AsSingleton().Keyed(PlayerId.Two));
             _registry.Add(Dependency.OnType<IPlayer>().Keyed("MainPlayer").LinkedTo<IPlayer>().Keyed(PlayerId.One));
 
-            var playerOne = _injector.Resolve<IPlayer>(serviceKey: PlayerId.One);
-            var playerTwo = _injector.Resolve<IPlayer>(serviceKey: PlayerId.Two);
-            var mainPlayer = _injector.Resolve<IPlayer>(serviceKey: "MainPlayer");
+            var playerOne = _injector.Resolve<IPlayer>(key: PlayerId.One);
+            var playerTwo = _injector.Resolve<IPlayer>(key: PlayerId.Two);
+            var mainPlayer = _injector.Resolve<IPlayer>(key: "MainPlayer");
 
             Assert.AreEqual(playerOne, mainPlayer);
             Assert.AreNotEqual(playerTwo, mainPlayer);

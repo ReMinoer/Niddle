@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Niddle.Base;
 
 namespace Niddle
@@ -12,14 +13,14 @@ namespace Niddle
             Registry = registry;
         }
 
-        public override object Resolve(Type type, InjectableAttributeBase injectableAttribute = null, object serviceKey = null, InstanceOrigins instanceOrigins = InstanceOrigins.All, IDependencyInjector dependencyInjector = null)
+        public override object Resolve(Type type, object serviceKey = null, InstanceOrigins origins = InstanceOrigins.All, IDependencyInjector dependencyInjector = null, IEnumerable<object> args = null)
         {
-            return Registry[type, serviceKey, instanceOrigins].Get(dependencyInjector ?? this);
+            return Registry[type, serviceKey, origins].Get(dependencyInjector ?? this);
         }
 
-        public override bool TryResolve(out object obj, Type type, InjectableAttributeBase injectableAttribute = null, object serviceKey = null, InstanceOrigins instanceOrigins = InstanceOrigins.All, IDependencyInjector dependencyInjector = null)
+        public override bool TryResolve(out object obj, Type type, object serviceKey = null, InstanceOrigins origins = InstanceOrigins.All, IDependencyInjector dependencyInjector = null, IEnumerable<object> args = null)
         {
-            if (!Registry.TryGetFactory(out IDependencyFactory factory, type, serviceKey, instanceOrigins))
+            if (!Registry.TryGetFactory(out IDependencyFactory factory, type, serviceKey, origins))
             {
                 obj = null;
                 return false;

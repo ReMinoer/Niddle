@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Reflection;
 using Niddle.Builders.Base;
 using Niddle.Builders.Helpers;
 using Niddle.Factories;
-using Niddle.Factories.Data;
 
 namespace Niddle.Builders
 {
@@ -11,7 +11,7 @@ namespace Niddle.Builders
     {
         protected Type Type { get; }
         protected object Instance { get; set; }
-        protected ConstructorData Constructor { get; set; }
+        protected IResolvableRejecter<object, IEnumerable, object> Instantiator { get; set; }
 
         protected override ITypeDependencyBuilder<T> Builder => this;
 
@@ -28,19 +28,18 @@ namespace Niddle.Builders
 
         public ITypeDependencyBuilder<T> Creating(Type implementationType)
         {
-            Constructor = new ConstructorData(ReflectionHelper.GetDefaultConstructor(implementationType));
-            return Builder;
+            return Creating(ReflectionHelper.GetDefaultConstructor(implementationType));
         }
 
         public ITypeDependencyBuilder<T> Creating(ConstructorInfo constructorInfo)
         {
-            Constructor = new ConstructorData(constructorInfo);
+            Instantiator = constructorInfo.AsResolvableRejecter();
             return Builder;
         }
 
         public ITypeDependencyBuilder<T> Creating(MethodInfo methodInfo)
         {
-            Constructor = new ConstructorData(methodInfo);
+            Instantiator = methodInfo.AsResolvableRejecter();
             return Builder;
         }
 
@@ -61,11 +60,13 @@ namespace Niddle.Builders
             if (Instance != null)
                 return new InstanceFactory(Type, Instance, Key, Substitution);
             
-            ConstructorData constructor = Constructor ?? new ConstructorData(ReflectionHelper.GetDefaultConstructor(Type));
+            IResolvableRejecter<object, IEnumerable, object> instantiator =
+                Instantiator
+                ?? ReflectionHelper.GetDefaultConstructor(Type).AsResolvableRejecter<object>();
 
             return Singleton
-                ? new SingletonFactory(Type, Key, constructor, Substitution)
-                : new NewInstanceFactory(Type, Key, constructor, Substitution);
+                ? new SingletonFactory(Type, Key, instantiator, Substitution)
+                : new NewInstanceFactory(Type, Key, instantiator, Substitution);
         }
         
         public ILinkTypeDependencyBuilder LinkedTo<TLinked>()

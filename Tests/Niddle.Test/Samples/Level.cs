@@ -1,4 +1,7 @@
-﻿namespace Niddle.Test.Samples
+﻿using Niddle.Attributes;
+using Niddle.Injectables;
+
+namespace Niddle.Test.Samples
 {
     public interface ILevel
     {
@@ -8,13 +11,13 @@
 
     public class Level : ILevel
     {
-        [Injectable]
+        [Resolvable]
         public ICharacter CharacterB;
 
         public Game Game { get; private set; }
         public IPlayer Player { get; private set; }
 
-        [Injectable]
+        [Resolvable]
         public ICharacter CharacterA { get; set; }
 
         public Level(Game game, IPlayer player)

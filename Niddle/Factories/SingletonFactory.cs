@@ -1,5 +1,5 @@
 ﻿using System;
-using Niddle.Factories.Data;
+using System.Collections;
 
 namespace Niddle.Factories
 {
@@ -8,8 +8,8 @@ namespace Niddle.Factories
         private object _instance;
         public override InstanceOrigin? InstanceOrigin => Niddle.InstanceOrigin.Registration;
 
-        public SingletonFactory(Type type, object serviceKey, ConstructorData constructorData, Substitution substitution)
-            : base(type, serviceKey, constructorData, substitution)
+        public SingletonFactory(Type type, object serviceKey, IResolvableRejecter<object, IEnumerable, object> resolvableInstantiator, Substitution substitution)
+            : base(type, serviceKey, resolvableInstantiator, substitution)
         {
         }
 
