@@ -13,6 +13,7 @@ namespace Niddle.Dependencies.Builders
         TBuilder AsSingleton();
         TBuilder Keyed(object key);
         TBuilder Overridable();
+        TBuilder ResolvingMembersFrom(IResolvableMembersProvider<object> provider);
         TLinkBuilder LinkedTo(Type linkedType);
     }
 

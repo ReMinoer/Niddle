@@ -86,22 +86,23 @@ namespace Niddle
 
         // AsResolvableInjectable
 
-        static public ResolvableInjectable<IResolvable<object>, InjectableProperty<TTarget, object>, TTarget, object> AsResolvableInjectable<TTarget>(this PropertyInfo propertyInfo)
-            => AsResolvableInjectableBase<InjectableProperty<TTarget, object>, TTarget, object>(propertyInfo, propertyInfo.PropertyType, x => new InjectableProperty<TTarget, object>(x, propertyInfo));
+        static public ResolvableInjectable<IResolvable<object>, InjectableProperty<TTarget, object>, TTarget, object, object> AsResolvableInjectable<TTarget>(this PropertyInfo propertyInfo)
+            => AsResolvableInjectableBase<InjectableProperty<TTarget, object>, TTarget, object, object>(propertyInfo, propertyInfo.PropertyType, x => new InjectableProperty<TTarget, object>(x, propertyInfo));
 
-        static public ResolvableInjectable<IResolvable<object>, InjectableField<TTarget, object>, TTarget, object> AsResolvableInjectable<TTarget>(this FieldInfo fieldInfo)
-            => AsResolvableInjectableBase<InjectableField<TTarget, object>, TTarget, object>(fieldInfo, fieldInfo.FieldType, x => new InjectableField<TTarget, object>(x, fieldInfo));
+        static public ResolvableInjectable<IResolvable<object>, InjectableField<TTarget, object>, TTarget, object, object> AsResolvableInjectable<TTarget>(this FieldInfo fieldInfo)
+            => AsResolvableInjectableBase<InjectableField<TTarget, object>, TTarget, object, object>(fieldInfo, fieldInfo.FieldType, x => new InjectableField<TTarget, object>(x, fieldInfo));
 
-        static private ResolvableInjectable<IResolvable<TValue>, TInjectable, TTarget, TValue> AsResolvableInjectableBase<TInjectable, TTarget, TValue>(MemberInfo memberInfo, Type defaultType, Func<IInjectionExpression, TInjectable> injectableFactory)
-            where TInjectable : IInjectable<TTarget, TValue>
+        static private ResolvableInjectable<IResolvable<TResolvableValue>, TInjectable, TTarget, TResolvableValue, TInjectableValue> AsResolvableInjectableBase<TInjectable, TTarget, TResolvableValue, TInjectableValue>(MemberInfo memberInfo, Type defaultType, Func<IInjectionExpression, TInjectable> injectableFactory)
+            where TInjectable : IInjectable<TTarget, TInjectableValue>
+            where TResolvableValue : TInjectableValue
         {
             Attribute[] attributes = memberInfo.Attributes();
             ResolvableAttributeBase resolvableAttribute = attributes.ResolvableAttribute();
 
-            IResolvable<TValue> resolvable = resolvableAttribute.GetResolvable<TValue>(defaultType, attributes);
+            IResolvable<TResolvableValue> resolvable = resolvableAttribute.GetResolvable<TResolvableValue>(defaultType, attributes);
             TInjectable injectable = injectableFactory(resolvableAttribute.GetInjectionScenario(defaultType));
 
-            return new ResolvableInjectable<IResolvable<TValue>, TInjectable, TTarget, TValue>(resolvable, injectable);
+            return new ResolvableInjectable<IResolvable<TResolvableValue>, TInjectable, TTarget, TResolvableValue, TInjectableValue>(resolvable, injectable);
         }
 
         static public ResolvableInjectable<IResolvable, InjectableParameter> AsResolvableInjectable(this ParameterInfo parameterInfo)
@@ -118,22 +119,22 @@ namespace Niddle
             return new ResolvableInjectable<IResolvable, InjectableParameter>(resolvable, injectable);
         }
 
-        static public ResolvableRejecter<IResolvable<IEnumerable>, InjectableConstructor<TTarget, IEnumerable, object>, TTarget, IEnumerable, object> AsResolvableRejecter<TTarget>(this ConstructorInfo constructorInfo)
+        static public ResolvableRejecter<IResolvable<IEnumerable>, InjectableConstructor<TTarget, IEnumerable, object>, TTarget, IEnumerable, IEnumerable, object> AsResolvableRejecter<TTarget>(this ConstructorInfo constructorInfo)
             => AsResolvableMethodRejecterBase<InjectableConstructor<TTarget, IEnumerable, object>, TTarget, object>(constructorInfo, new InjectableConstructor<TTarget, IEnumerable, object>(constructorInfo));
 
-        static public ResolvableRejecter<IResolvable<IEnumerable>, InjectableMethod<TTarget, IEnumerable, object>, TTarget, IEnumerable, object> AsResolvableRejecter<TTarget>(this MethodInfo methodInfo)
+        static public ResolvableRejecter<IResolvable<IEnumerable>, InjectableMethod<TTarget, IEnumerable, object>, TTarget, IEnumerable, IEnumerable, object> AsResolvableRejecter<TTarget>(this MethodInfo methodInfo)
             => AsResolvableMethodRejecterBase<InjectableMethod<TTarget, IEnumerable, object>, TTarget, object>(methodInfo, new InjectableMethod<TTarget, IEnumerable, object>(methodInfo));
 
-        static private ResolvableRejecter<IResolvable<IEnumerable>, TRejecter, TTarget, IEnumerable, TReject> AsResolvableMethodRejecterBase<TRejecter, TTarget, TReject>(MethodBase methodBase, TRejecter rejecter)
+        static private ResolvableRejecter<IResolvable<IEnumerable>, TRejecter, TTarget, IEnumerable, IEnumerable, TReject> AsResolvableMethodRejecterBase<TRejecter, TTarget, TReject>(MethodBase methodBase, TRejecter rejecter)
             where TRejecter : IRejecterMethod<TTarget, IEnumerable, TReject>
         {
             var resolvable = new EnumerableResolvable(methodBase.GetParameters().Select(x => x.AsResolvableInjectable()));
-            return new ResolvableRejecter<IResolvable<IEnumerable>, TRejecter, TTarget, IEnumerable, TReject>(resolvable, rejecter);
+            return new ResolvableRejecter<IResolvable<IEnumerable>, TRejecter, TTarget, IEnumerable, IEnumerable, TReject>(resolvable, rejecter);
         }
 
-        static public ResolvableInjectable<IResolvable<object>, InjectableProperty<object, object>, object, object> AsResolvableInjectable(this PropertyInfo propertyInfo) => propertyInfo.AsResolvableInjectable<object>();
-        static public ResolvableInjectable<IResolvable<object>, InjectableField<object, object>, object, object> AsResolvableInjectable(this FieldInfo fieldInfo) => fieldInfo.AsResolvableInjectable<object>();
-        static public ResolvableRejecter<IResolvable<IEnumerable>, InjectableConstructor<object, IEnumerable, object>, object, IEnumerable, object> AsResolvableRejecter(this ConstructorInfo constructorInfo) => constructorInfo.AsResolvableRejecter<object>();
-        static public ResolvableRejecter<IResolvable<IEnumerable>, InjectableMethod<object, IEnumerable, object>, object, IEnumerable, object> AsResolvableRejecter(this MethodInfo methodInfo) => methodInfo.AsResolvableRejecter<object>();
+        static public ResolvableInjectable<IResolvable<object>, InjectableProperty<object, object>, object, object, object> AsResolvableInjectable(this PropertyInfo propertyInfo) => propertyInfo.AsResolvableInjectable<object>();
+        static public ResolvableInjectable<IResolvable<object>, InjectableField<object, object>, object, object, object> AsResolvableInjectable(this FieldInfo fieldInfo) => fieldInfo.AsResolvableInjectable<object>();
+        static public ResolvableRejecter<IResolvable<IEnumerable>, InjectableConstructor<object, IEnumerable, object>, object, IEnumerable, IEnumerable, object> AsResolvableRejecter(this ConstructorInfo constructorInfo) => constructorInfo.AsResolvableRejecter<object>();
+        static public ResolvableRejecter<IResolvable<IEnumerable>, InjectableMethod<object, IEnumerable, object>, object, IEnumerable, IEnumerable, object> AsResolvableRejecter(this MethodInfo methodInfo) => methodInfo.AsResolvableRejecter<object>();
     }
 }

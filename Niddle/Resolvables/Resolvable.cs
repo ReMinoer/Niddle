@@ -1,4 +1,5 @@
 ﻿using Niddle.Resolvables.Base;
+using Niddle.Utils;
 
 namespace Niddle.Resolvables
 {
@@ -13,6 +14,13 @@ namespace Niddle.Resolvables
         {
             return resolver.TryResolve(out value, Type, Key, InstanceOrigins, resolver, AdditionalArguments);
         }
+
+        IOptional<object> IResolvable<object>.TryResolve(IDependencyResolver resolver)
+        {
+            return TryResolve(resolver, out object value)
+                ? new Optional<object>(value)
+                : Optional<object>.NoValue;
+        }
     }
 
     public class Resolvable<TValue> : SingleResolvableBase<TValue>
@@ -22,9 +30,11 @@ namespace Niddle.Resolvables
             return resolver.Resolve<TValue>(Key, InstanceOrigins, resolver, AdditionalArguments);
         }
 
-        public override bool TryResolve(IDependencyResolver resolver, out TValue value)
+        public override IOptional<TValue> TryResolve(IDependencyResolver resolver)
         {
-            return resolver.TryResolve(out value, Key, InstanceOrigins, resolver, AdditionalArguments);
+            return resolver.TryResolve(out TValue value, Key, InstanceOrigins, resolver, AdditionalArguments)
+                ? value
+                : Optional<TValue>.NoValue;
         }
     }
 }

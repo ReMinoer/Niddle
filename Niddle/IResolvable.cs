@@ -6,9 +6,9 @@
         bool TryResolve(IDependencyResolver resolver, out object value);
     }
 
-    public interface IResolvable<TValue> : IResolvable
+    public interface IResolvable<out TValue> : IResolvable
     {
         new TValue Resolve(IDependencyResolver resolver);
-        bool TryResolve(IDependencyResolver resolver, out TValue value);
+        IOptional<TValue> TryResolve(IDependencyResolver resolver);
     }
 }

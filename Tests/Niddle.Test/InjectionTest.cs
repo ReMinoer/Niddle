@@ -75,7 +75,9 @@ namespace Niddle.Test
         [Test]
         public void RegisterAction()
         {
-            _registry.Add(Dependency.OnType<Level>());
+            IResolvableMembersProvider<object> resolvableMembersProvider = new ResolvableMembersProvider();
+
+            _registry.Add(Dependency.OnType<Level>().ResolvingMembersFrom(resolvableMembersProvider));
             _registry.Add(Dependency.OnType<ICharacter>().Creating<Character>());
             _registry.Add(Dependency.OnType<IPlayer>().Creating<Player>());
             _registry.Add(Dependency.OnType<Game>());
@@ -169,7 +171,9 @@ namespace Niddle.Test
         [Test]
         public void InjectPropertyAndField()
         {
-            _registry.Add(Dependency.OnType<Level>());
+            IResolvableMembersProvider<object> resolvableMembersProvider = new ResolvableMembersProvider();
+
+            _registry.Add(Dependency.OnType<Level>().ResolvingMembersFrom(resolvableMembersProvider));
             _registry.Add(Dependency.OnType<IPlayer>().Creating<Player>());
             _registry.Add(Dependency.OnType<Game>().AsSingleton());
 

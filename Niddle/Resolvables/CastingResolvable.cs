@@ -1,4 +1,6 @@
-﻿namespace Niddle.Resolvables
+﻿using Niddle.Utils;
+
+namespace Niddle.Resolvables
 {
     public class CastingResolvable<TValue> : IResolvable<TValue>
     {
@@ -9,16 +11,11 @@
             return (TValue)Resolvable.Resolve(resolver);
         }
 
-        public bool TryResolve(IDependencyResolver resolver, out TValue value)
+        public IOptional<TValue> TryResolve(IDependencyResolver resolver)
         {
-            if (Resolvable.TryResolve(resolver, out object obj))
-            {
-                value = (TValue)obj;
-                return true;
-            }
-
-            value = default(TValue);
-            return false;
+            return Resolvable.TryResolve(resolver, out object obj)
+                ? (TValue)obj
+                : Optional<TValue>.NoValue;
         }
 
         object IResolvable.Resolve(IDependencyResolver resolver) => Resolvable.Resolve(resolver);

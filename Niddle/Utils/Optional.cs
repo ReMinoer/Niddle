@@ -6,7 +6,7 @@
         public T Value { get; }
         
         private Optional() {}
-        private Optional(T value)
+        public Optional(T value)
         {
             HasValue = true;
             Value = value;

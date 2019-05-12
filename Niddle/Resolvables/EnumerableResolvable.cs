@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Niddle.Resolvables.Base;
+using Niddle.Utils;
 
 namespace Niddle.Resolvables
 {
@@ -19,24 +20,18 @@ namespace Niddle.Resolvables
             return _resolvables.Select(x => x.Resolve(resolver));
         }
 
-        public override bool TryResolve(IDependencyResolver resolver, out IEnumerable value)
+        public override IOptional<IEnumerable> TryResolve(IDependencyResolver resolver)
         {
             var parameters = new List<object>(_resolvables.Count);
             foreach (IResolvable resolvable in _resolvables)
             {
                 if (resolvable.TryResolve(resolver, out object parameterValue))
-                {
                     parameters.Add(parameterValue);
-                }
                 else
-                {
-                    value = null;
-                    return false;
-                }
+                    return Optional<IEnumerable>.NoValue;
             }
-
-            value = parameters;
-            return true;
+            
+            return new Optional<IEnumerable>(parameters);
         }
 
         public IEnumerator<IResolvable> GetEnumerator() => _resolvables.GetEnumerator();

@@ -8,8 +8,9 @@ namespace Niddle.Dependencies.Factories
         private object _instance;
         public override InstanceOrigin? InstanceOrigin => Niddle.InstanceOrigin.Registration;
 
-        public SingletonFactory(Type type, object serviceKey, IResolvableRejecter<object, IEnumerable, object> resolvableInstantiator, Substitution substitution)
-            : base(type, serviceKey, resolvableInstantiator, substitution)
+        public SingletonFactory(Type type, object serviceKey, IResolvableRejecter<object, IEnumerable, IEnumerable, object> resolvableInstantiator, Substitution substitution,
+                                IResolvableMembersProvider<object> resolvableMembersProvider = null)
+            : base(type, serviceKey, resolvableInstantiator, substitution, resolvableMembersProvider)
         {
         }
 

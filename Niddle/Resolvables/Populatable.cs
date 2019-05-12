@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Niddle.Resolvables.Base;
+using Niddle.Utils;
 
 namespace Niddle.Resolvables
 {
@@ -19,7 +20,7 @@ namespace Niddle.Resolvables
                     yield return item;
         }
 
-        public override bool TryResolve(IDependencyResolver resolver, out IEnumerable value)
+        public override IOptional<IEnumerable> TryResolve(IDependencyResolver resolver)
         {
             var valueList = new List<object>();
             foreach (Type itemType in Type.GetPopulatableTypes(PopulateMethodName))
@@ -31,8 +32,7 @@ namespace Niddle.Resolvables
                     valueList.Add(item);
             }
 
-            value = valueList;
-            return valueList.Count > 0;
+            return valueList.Count > 0 ? valueList : Optional<IEnumerable>.NoValue;
         }
     }
 

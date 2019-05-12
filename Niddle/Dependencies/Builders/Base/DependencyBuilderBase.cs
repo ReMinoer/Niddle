@@ -8,6 +8,7 @@ namespace Niddle.Dependencies.Builders.Base
         protected bool Singleton { get; set; }
         protected object Key { get; set; }
         protected bool IsOverridable { get; set; }
+        protected IResolvableMembersProvider<object> ResolvableMembersProvider { get; set; }
 
         protected Substitution Substitution => IsOverridable ? Substitution.Allowed : Substitution.Forbidden;
 
@@ -31,6 +32,12 @@ namespace Niddle.Dependencies.Builders.Base
         public TBuilder Overridable()
         {
             IsOverridable = true;
+            return Builder;
+        }
+
+        public TBuilder ResolvingMembersFrom(IResolvableMembersProvider<object> provider)
+        {
+            ResolvableMembersProvider = provider;
             return Builder;
         }
 

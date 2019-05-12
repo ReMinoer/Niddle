@@ -37,7 +37,7 @@ namespace Niddle.Dependencies.Builders
         protected override IGenericFactory Build()
         {
             ConstructorInfo constructor = Constructor ?? ReflectionHelper.GetDefaultConstructor(ImplementationTypeDefinition ?? TypeDefinition);
-            return new GenericFactory(TypeDefinition, ImplementationTypeDefinition, Origin, Key, constructor, Substitution);
+            return new GenericFactory(TypeDefinition, ImplementationTypeDefinition, Origin, Key, constructor, Substitution, ResolvableMembersProvider);
         }
 
         public override ILinkGenericDependencyBuilder LinkedTo(Type linkedType)

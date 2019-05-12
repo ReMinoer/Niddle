@@ -11,7 +11,7 @@ namespace Niddle.Dependencies.Builders
     {
         protected Type Type { get; }
         protected object Instance { get; set; }
-        protected IResolvableRejecter<object, IEnumerable, object> Instantiator { get; set; }
+        protected IResolvableRejecter<object, IEnumerable, IEnumerable, object> Instantiator { get; set; }
 
         protected override ITypeDependencyBuilder<T> Builder => this;
 
@@ -60,13 +60,13 @@ namespace Niddle.Dependencies.Builders
             if (Instance != null)
                 return new InstanceFactory(Type, Instance, Key, Substitution);
             
-            IResolvableRejecter<object, IEnumerable, object> instantiator =
+            IResolvableRejecter<object, IEnumerable, IEnumerable, object> instantiator =
                 Instantiator
                 ?? ReflectionHelper.GetDefaultConstructor(Type).AsResolvableRejecter<object>();
 
             return Singleton
-                ? new SingletonFactory(Type, Key, instantiator, Substitution)
-                : new NewInstanceFactory(Type, Key, instantiator, Substitution);
+                ? new SingletonFactory(Type, Key, instantiator, Substitution, ResolvableMembersProvider)
+                : new NewInstanceFactory(Type, Key, instantiator, Substitution, ResolvableMembersProvider);
         }
         
         public ILinkTypeDependencyBuilder LinkedTo<TLinked>()

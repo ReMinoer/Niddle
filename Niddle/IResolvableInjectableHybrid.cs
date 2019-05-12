@@ -8,9 +8,10 @@
         TInjectable Injectable { get; }
     }
 
-    public interface IResolvableInjectableHybrid<out TResolvable, out TInjectable, in TTarget, TValue> : IResolvableInjectableHybrid<TResolvable, TInjectable>, IResolvableInjectable<TTarget, TValue>
-        where TResolvable : IResolvable<TValue>
-        where TInjectable : IInjectable<TTarget, TValue>
+    public interface IResolvableInjectableHybrid<out TResolvable, out TInjectable, in TTarget, out TResolvableValue, in TInjectableValue> : IResolvableInjectableHybrid<TResolvable, TInjectable>, IResolvableInjectable<TTarget, TResolvableValue, TInjectableValue>
+        where TResolvable : IResolvable<TResolvableValue>
+        where TInjectable : IInjectable<TTarget, TInjectableValue>
+        where TResolvableValue : TInjectableValue
     {
     }
 }

@@ -10,7 +10,8 @@
         bool TryResolveAndInject(IDependencyResolver resolver, TTarget target);
     }
 
-    public interface IResolvableInjectable<in TTarget, TValue> : IResolvableInjectable<TTarget>, IResolvable<TValue>, IInjectable<TTarget, TValue>
+    public interface IResolvableInjectable<in TTarget, out TResolvableValue, in TInjectableValue> : IResolvableInjectable<TTarget>, IResolvable<TResolvableValue>, IInjectable<TTarget, TInjectableValue>
+        where TResolvableValue : TInjectableValue
     {
     }
 }
