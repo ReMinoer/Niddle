@@ -61,15 +61,59 @@ namespace Niddle
 
         // AsInjectable
 
-        static public InjectableProperty<object, object> AsInjectable(this PropertyInfo propertyInfo)
-            => AsInjectableBase(propertyInfo, propertyInfo.PropertyType, x => new InjectableProperty<object, object>(x, propertyInfo));
+        static public InjectableProperty<object, object> AsInjectable(this PropertyInfo propertyInfo, IInjectionExpression injectionExpression = null)
+            => AsInjectableBase(propertyInfo, propertyInfo.PropertyType, injectionExpression, x => new InjectableProperty<object, object>(x, propertyInfo));
+        static public InjectableProperty<TTarget, TValue> AsInjectable<TTarget, TValue>(this PropertyInfo propertyInfo, IInjectionExpression injectionExpression = null)
+            => AsInjectableBase(propertyInfo, propertyInfo.PropertyType, injectionExpression, x => new InjectableProperty<TTarget, TValue>(x, propertyInfo));
 
-        static public InjectableField<object, object> AsInjectable(this FieldInfo fieldInfo)
-            => AsInjectableBase(fieldInfo, fieldInfo.FieldType, x => new InjectableField<object, object>(x, fieldInfo));
+        static public InjectableField<object, object> AsInjectable(this FieldInfo fieldInfo, IInjectionExpression injectionExpression = null)
+            => AsInjectableBase(fieldInfo, fieldInfo.FieldType, injectionExpression, x => new InjectableField<object, object>(x, fieldInfo));
+        static public InjectableField<TTarget, TValue> AsInjectable<TTarget, TValue>(this FieldInfo fieldInfo, IInjectionExpression injectionExpression = null)
+            => AsInjectableBase(fieldInfo, fieldInfo.FieldType, injectionExpression, x => new InjectableField<TTarget, TValue>(x, fieldInfo));
 
-        static private TInjectable AsInjectableBase<TInjectable>(MemberInfo memberInfo, Type memberType, Func<IInjectionExpression, TInjectable> injectableFactory)
+        static public InjectableProperty<TInputTarget, TValue> AsInjectable<TInputTarget, TSelectedTarget, TValue>
+        (
+            this PropertyInfo propertyInfo,
+            Func<TInputTarget, TSelectedTarget> targetSelector,
+            IInjectionExpression injectionExpression = null
+        )
+            => AsInjectableBase(propertyInfo, propertyInfo.PropertyType, injectionExpression,
+                x => new InjectableProperty<TInputTarget, TValue>(x, propertyInfo, targetSelector));
+
+        static public InjectableProperty<TInputTarget, TValue> AsInjectable<TInputTarget, TValue>
+        (
+            this PropertyInfo propertyInfo,
+            Delegate targetSelectorDelegate,
+            IInjectionExpression injectionExpression = null
+        )
+            => AsInjectableBase(propertyInfo, propertyInfo.PropertyType, injectionExpression,
+                x => new InjectableProperty<TInputTarget, TValue>(x, propertyInfo, targetSelectorDelegate));
+        
+        static public InjectableField<TInputTarget, TValue> AsInjectable<TInputTarget, TSelectedTarget, TValue>
+        (
+            this FieldInfo fieldInfo,
+            Func<TInputTarget, TSelectedTarget> targetSelector,
+            IInjectionExpression injectionExpression = null
+        )
+            => AsInjectableBase(fieldInfo, fieldInfo.FieldType, injectionExpression,
+                x => new InjectableField<TInputTarget, TValue>(x, fieldInfo, targetSelector));
+        
+        static public InjectableField<TInputTarget, TValue> AsInjectable<TInputTarget, TValue>
+        (
+            this FieldInfo fieldInfo,
+            Delegate targetSelectorDelegate,
+            IInjectionExpression injectionExpression = null
+        )
+            => AsInjectableBase(fieldInfo, fieldInfo.FieldType, injectionExpression,
+                x => new InjectableField<TInputTarget, TValue>(x, fieldInfo, targetSelectorDelegate));
+
+        static private TInjectable AsInjectableBase<TInjectable>(
+            MemberInfo memberInfo,
+            Type memberType,
+            IInjectionExpression injectionExpression,
+            Func<IInjectionExpression, TInjectable> injectableFactory)
         {
-            return injectableFactory(memberInfo.Attributes().ResolvableAttribute().GetInjectionScenario(memberType));
+            return injectableFactory(injectionExpression ?? memberInfo.Attributes().ResolvableAttribute().GetInjectionScenario(memberType));
         }
 
         static public InjectableParameter AsInjectable(this ParameterInfo parameterInfo)
