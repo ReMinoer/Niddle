@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Niddle.Dependencies.Builders;
 
-namespace Niddle
+namespace Niddle.Dependencies.Builders
 {
     public class DependencyRegistryConfigurator : IEnumerable
     {

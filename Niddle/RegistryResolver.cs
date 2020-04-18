@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Niddle.Base;
+using Niddle.Dependencies;
 
 namespace Niddle
 {

@@ -21,7 +21,7 @@ namespace Niddle.Injectables.Base
 
         protected InjectableMethodBase(TMethod methodBase)
         {
-            InjectableParameter[] parameters = methodBase.GetParameters().Select(x => new InjectableParameter(CustomAttributeExtensions.GetCustomAttribute<ResolvableAttributeBase>((ParameterInfo)x)?.GetInjectionScenario(x.ParameterType) ?? new AssignementInjection(), x)).ToArray();
+            InjectableParameter[] parameters = methodBase.GetParameters().Select(x => new InjectableParameter(x.GetCustomAttribute<ResolvableAttributeBase>()?.GetInjectionScenario(x.ParameterType) ?? new AssignementInjection(), x)).ToArray();
             Parameters = new ReadOnlyCollection<InjectableParameter>(parameters);
 
             Delegate = BuildDelegate(methodBase, Parameters);

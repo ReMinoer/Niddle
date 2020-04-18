@@ -1,4 +1,5 @@
-﻿using Niddle.Dependencies.Builders;
+﻿using Niddle.Dependencies;
+using Niddle.Dependencies.Builders;
 
 namespace Niddle
 {

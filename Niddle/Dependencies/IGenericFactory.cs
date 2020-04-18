@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Niddle
+namespace Niddle.Dependencies
 {
     public interface IGenericFactory : IFactory
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Niddle
+namespace Niddle.Dependencies
 {
     public interface IFactory
     {

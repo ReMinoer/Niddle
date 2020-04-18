@@ -1,4 +1,4 @@
-﻿namespace Niddle
+﻿namespace Niddle.Dependencies
 {
     public interface IDependencyFactory : IFactory
     {
