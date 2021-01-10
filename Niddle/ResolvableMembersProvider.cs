@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Niddle.Attributes.Base;
+using Niddle.Utils;
 
 namespace Niddle
 {
@@ -18,11 +19,8 @@ namespace Niddle
         public IEnumerable<IResolvableInjectable<TTarget, object, object>> ForType<T>() => ForType(typeof(T));
         public IEnumerable<IResolvableInjectable<TTarget, object, object>> ForType(Type type)
         {
-            foreach (FieldInfo fieldInfo in type.GetRuntimeFields())
+            foreach (FieldInfo fieldInfo in type.GetAccessibleFields())
             {
-                if (!fieldInfo.IsPublic)
-                    continue;
-
                 var attribute = fieldInfo.GetCustomAttribute<ResolvableAttributeBase>();
                 if (attribute == null)
                     continue;
@@ -30,30 +28,14 @@ namespace Niddle
                 yield return fieldInfo.AsResolvableInjectable<TTarget>();
             }
 
-            foreach (PropertyInfo propertyInfo in type.GetRuntimeProperties())
+            foreach (PropertyInfo propertyInfo in type.GetAccessibleProperties())
             {
-                if ((propertyInfo.SetMethod == null || !propertyInfo.SetMethod.IsPublic)
-                    && (propertyInfo.GetMethod == null || !propertyInfo.GetMethod.IsPublic))
-                    continue;
-
                 var attribute = propertyInfo.GetCustomAttribute<ResolvableAttributeBase>();
                 if (attribute == null)
                     continue;
 
                 yield return propertyInfo.AsResolvableInjectable<TTarget>();
             }
-
-            //foreach (MethodInfo methodInfo in type.GetRuntimeMethods())
-            //{
-            //    if (!methodInfo.IsPublic)
-            //        continue;
-
-            //    var attribute = methodInfo.GetCustomAttribute<ResolvableAttributeBase>();
-            //    if (attribute == null)
-            //        continue;
-
-            //    yield return methodInfo.AsResolvableRejecter<TTarget>();
-            //}
         }
     }
     
